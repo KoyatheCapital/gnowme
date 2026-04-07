@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+mistralai
+llama-index
+llama-index-vector-stores-postgres
+sqlalchemy
+psycopg2-binary
+pydantic
