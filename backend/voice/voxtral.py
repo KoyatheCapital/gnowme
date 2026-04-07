@@ -1,6 +1,6 @@
 import base64
 from pathlib import Path
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 class GnowmeVoice:
     def __init__(self, api_key: str, ref_path: str):

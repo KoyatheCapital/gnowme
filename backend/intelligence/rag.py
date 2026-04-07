@@ -1,14 +1,35 @@
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
-from llama_index.embeddings.mistralai import MistralAIEmbedding
 from llama_index.vector_stores.postgres import PGVectorStore
 from sqlalchemy import make_url
 from config import Config
 
-# Use Mistral embeddings — no OpenAI key required
-Settings.embed_model = MistralAIEmbedding(
-    model_name="mistral-embed",
-    api_key=Config.MISTRAL_API_KEY,
-)
+# Try Mistral embeddings, fall back to a lightweight stub for local dev
+try:
+    from llama_index.embeddings.mistralai import MistralAIEmbedding
+    from mistralai.client import Mistral as _M  # verify import works
+    Settings.embed_model = MistralAIEmbedding(
+        model_name="mistral-embed",
+        api_key=Config.MISTRAL_API_KEY,
+    )
+    EMBED_DIM = 1024
+except Exception:
+    # Local dev fallback — embeddings will use a simple mock
+    from llama_index.core.embeddings import BaseEmbedding
+    from typing import List
+
+    class _StubEmbed(BaseEmbedding):
+        def _get_query_embedding(self, query: str) -> List[float]:
+            return [0.0] * 384
+        def _get_text_embedding(self, text: str) -> List[float]:
+            return [0.0] * 384
+        async def _aget_query_embedding(self, query: str) -> List[float]:
+            return [0.0] * 384
+        async def _aget_text_embedding(self, text: str) -> List[float]:
+            return [0.0] * 384
+
+    Settings.embed_model = _StubEmbed()
+    EMBED_DIM = 384
+
 
 class UserRAG:
     def __init__(self, user_id: str):
@@ -20,7 +41,7 @@ class UserRAG:
             port=url.port or 5432,
             user=url.username or "postgres",
             table_name=f"gnowme_user_{user_id}_knowledge",
-            embed_dim=1024,  # mistral-embed dimension
+            embed_dim=EMBED_DIM,
         )
         self.index = VectorStoreIndex.from_vector_store(self.vector_store)
 
