@@ -5,455 +5,794 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gnowme</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#08080e;--bg2:#0f0f18;--card:#13131f;--border:#1c1c2c;
+      --orb:#7c6fff;--orb2:#b49fff;--text:#e8e8f4;--muted:#5a5a72;
+      --accent:#7c6fff;--green:#3ddc84;--red:#ff6b6b;--gold:#f5c542;
+    }
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column}
 
-    :root {
-      --bg: #0a0a0f;
-      --orb: #7c6fff;
-      --orb-glow: rgba(124, 111, 255, 0.18);
-      --text: #e8e8f0;
-      --muted: #6b6b80;
-      --card: #13131a;
-      --border: #1e1e2a;
-      --accent: #7c6fff;
-    }
+    /* NAV */
+    nav{display:flex;justify-content:space-between;align-items:center;padding:18px 28px;border-bottom:1px solid var(--border);background:rgba(8,8,14,0.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50}
+    .logo{font-size:17px;font-weight:600;letter-spacing:0.06em;color:var(--orb2)}
+    .nav-tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px}
+    .tab-btn{background:none;border:none;color:var(--muted);padding:7px 16px;border-radius:7px;font-size:13px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+    .tab-btn.active{background:var(--accent);color:#fff}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    /* PAGES */
+    .page{display:none;flex:1;flex-direction:column}
+    .page.active{display:flex}
 
-    /* ── NAV ── */
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 32px;
-      border-bottom: 1px solid var(--border);
-    }
-    .logo { font-size: 18px; font-weight: 600; letter-spacing: 0.05em; color: var(--text); }
-    .nav-links { display: flex; gap: 8px; }
-    .nav-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .nav-btn.active, .nav-btn:hover {
-      background: var(--card);
-      color: var(--text);
-      border-color: var(--accent);
-    }
+    /* ═══════════════════════════ HOME ═══════════════════════════ */
+    #home{align-items:center;justify-content:center;gap:32px;padding:40px 24px;min-height:calc(100vh - 60px)}
 
-    /* ── PAGES ── */
-    .page { display: none; flex: 1; }
-    .page.active { display: flex; }
+    .orb-wrap{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center}
+    .ring{position:absolute;border-radius:50%;border:1px solid rgba(124,111,255,0.15);animation:ring 4s ease-in-out infinite}
+    .ring:nth-child(1){width:220px;height:220px;animation-delay:0s}
+    .ring:nth-child(2){width:170px;height:170px;animation-delay:0.7s}
+    .ring:nth-child(3){width:120px;height:120px;animation-delay:1.4s}
+    @keyframes ring{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:0.15;transform:scale(1.04)}}
 
-    /* ── HOME ── */
-    #home {
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 40px;
-      padding: 40px 20px;
-    }
+    .orb{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--orb2),var(--orb));
+      box-shadow:0 0 50px rgba(124,111,255,0.5),0 0 100px rgba(124,111,255,0.2);
+      animation:breathe 4s ease-in-out infinite;cursor:pointer;position:relative;z-index:1;
+      display:flex;align-items:center;justify-content:center;font-size:28px;transition:box-shadow 0.3s}
+    .orb:hover{box-shadow:0 0 70px rgba(124,111,255,0.7),0 0 130px rgba(124,111,255,0.3)}
+    .orb.listening{animation:pulse 0.8s ease-in-out infinite;background:radial-gradient(circle at 35% 35%,#ff9fff,#c06fff)}
+    .orb.speaking{animation:pulse 1.2s ease-in-out infinite}
+    @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 
-    .orb-container {
-      position: relative;
-      width: 200px;
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .orb-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid var(--orb-glow);
-      animation: ring-pulse 4s ease-in-out infinite;
-    }
-    .orb-ring:nth-child(1) { width: 200px; height: 200px; animation-delay: 0s; }
-    .orb-ring:nth-child(2) { width: 160px; height: 160px; animation-delay: 0.5s; }
-    .orb-ring:nth-child(3) { width: 120px; height: 120px; animation-delay: 1s; }
+    .voice-status{font-size:13px;color:var(--muted);min-height:20px;text-align:center}
+    .voice-status.active{color:var(--orb2)}
 
-    .orb {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #a89fff, var(--orb));
-      box-shadow: 0 0 40px rgba(124, 111, 255, 0.5), 0 0 80px rgba(124, 111, 255, 0.2);
-      animation: orb-breathe 4s ease-in-out infinite;
-      cursor: pointer;
-      position: relative;
-      z-index: 1;
-    }
-    .orb:hover { box-shadow: 0 0 60px rgba(124, 111, 255, 0.7), 0 0 100px rgba(124, 111, 255, 0.3); }
+    .guidance-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 26px;max-width:400px;width:100%;line-height:1.75;font-size:14px;color:var(--muted);min-height:90px;transition:color 0.4s}
+    .guidance-card.live{color:var(--text);border-color:rgba(124,111,255,0.3)}
 
-    @keyframes orb-breathe {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.12); }
-    }
-    @keyframes ring-pulse {
-      0%, 100% { opacity: 0.2; transform: scale(1); }
-      50% { opacity: 0.05; transform: scale(1.05); }
-    }
+    .home-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+    .btn-primary{background:var(--accent);color:#fff;border:none;padding:13px 28px;border-radius:50px;font-size:14px;cursor:pointer;transition:all 0.2s;font-weight:500}
+    .btn-primary:hover{background:#9487ff;transform:translateY(-1px)}
+    .btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border);padding:13px 24px;border-radius:50px;font-size:14px;cursor:pointer;transition:all 0.2s}
+    .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
 
-    .home-label {
-      text-align: center;
-    }
-    .home-label h1 { font-size: 22px; font-weight: 400; margin-bottom: 8px; }
-    .home-label p  { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 280px; }
+    .active-modules{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:400px}
+    .module-pill{font-size:11px;padding:4px 12px;border-radius:20px;background:rgba(124,111,255,0.12);border:1px solid rgba(124,111,255,0.25);color:var(--orb2)}
 
-    .guidance-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 24px;
-      max-width: 380px;
-      width: 100%;
-      font-size: 14px;
-      line-height: 1.7;
-      color: var(--muted);
-      min-height: 80px;
-      transition: color 0.4s;
-    }
-    .guidance-box.speaking { color: var(--text); }
+    /* ═══════════════════════════ ALARM ═══════════════════════════ */
+    #alarm{padding:32px 28px;max-width:560px;margin:0 auto;width:100%;gap:24px}
+    .alarm-hero{background:linear-gradient(135deg,#13131f,#1a1030);border:1px solid var(--border);border-radius:20px;padding:32px;text-align:center;gap:20px;display:flex;flex-direction:column;align-items:center}
+    .alarm-time-display{font-size:64px;font-weight:200;letter-spacing:0.05em;color:var(--text);font-variant-numeric:tabular-nums}
+    .alarm-toggle{position:relative;width:56px;height:30px;cursor:pointer}
+    .alarm-toggle input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:30px;transition:0.3s}
+    .toggle-slider:before{content:'';position:absolute;width:22px;height:22px;left:4px;top:4px;background:#fff;border-radius:50%;transition:0.3s}
+    .alarm-toggle input:checked+.toggle-slider{background:var(--accent)}
+    .alarm-toggle input:checked+.toggle-slider:before{transform:translateX(26px)}
+    .alarm-row{display:flex;align-items:center;justify-content:space-between;width:100%;gap:16px}
+    .alarm-label{font-size:14px;color:var(--muted)}
 
-    .speak-btn {
-      background: var(--orb);
-      color: #fff;
-      border: none;
-      padding: 14px 32px;
-      border-radius: 50px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.02em;
-    }
-    .speak-btn:hover { background: #9487ff; transform: translateY(-1px); }
-    .speak-btn:active { transform: translateY(0); }
+    .time-picker{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 16px;color:var(--text);font-size:28px;font-weight:300;outline:none;width:180px;text-align:center;cursor:pointer;transition:border-color 0.2s}
+    .time-picker:focus{border-color:var(--accent)}
 
-    /* ── GALLERY ── */
-    #gallery {
-      flex-direction: column;
-      padding: 32px;
-      max-width: 720px;
-      margin: 0 auto;
-      width: 100%;
-      gap: 24px;
-    }
-    #gallery h2 { font-size: 20px; font-weight: 500; }
-    #gallery p.sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+    .section-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:-8px}
 
-    .search-bar {
-      width: 100%;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 16px;
-      color: var(--text);
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .search-bar:focus { border-color: var(--accent); }
-    .search-bar::placeholder { color: var(--muted); }
+    .mood-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .mood-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:all 0.2s;gap:6px;display:flex;flex-direction:column;align-items:center}
+    .mood-card:hover,.mood-card.selected{border-color:var(--accent);background:#13131f}
+    .mood-card.selected{background:rgba(124,111,255,0.1)}
+    .mood-emoji{font-size:24px}
+    .mood-name{font-size:12px;font-weight:600;color:var(--text)}
+    .mood-desc{font-size:10px;color:var(--muted);line-height:1.4}
 
-    .books-grid { display: flex; flex-direction: column; gap: 12px; }
+    .preview-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;font-size:13px;line-height:1.75;color:var(--muted);font-style:italic;min-height:80px}
+    .preview-box.loaded{color:var(--text);font-style:normal}
 
-    .book-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px 20px;
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      transition: border-color 0.2s;
-    }
-    .book-card:hover { border-color: var(--accent); }
-    .book-card.active-module { border-color: var(--accent); background: #13131f; }
+    .alarm-status{text-align:center;font-size:13px;padding:12px;border-radius:10px;background:rgba(61,220,132,0.08);border:1px solid rgba(61,220,132,0.2);color:var(--green);display:none}
+    .alarm-status.active{display:block}
 
-    .book-cover {
-      width: 56px;
-      height: 72px;
-      border-radius: 6px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-    }
-    .book-info { flex: 1; }
-    .book-title { font-size: 15px; font-weight: 500; margin-bottom: 3px; }
-    .book-author { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-    .book-tag {
-      display: inline-block;
-      font-size: 11px;
-      color: var(--accent);
-      background: rgba(124,111,255,0.12);
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-bottom: 8px;
-    }
-    .book-consciousness { font-size: 12px; color: var(--muted); line-height: 1.5; }
-    .book-actions {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-    .book-price { font-size: 14px; font-weight: 600; }
-    .add-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 7px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
-    }
-    .add-btn:hover { background: #9487ff; }
-    .add-btn.added {
-      background: #1e2a1e;
-      color: #4caf50;
-      border: 1px solid #4caf50;
-      cursor: default;
-    }
-    .priority-select {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      outline: none;
-    }
+    /* ═══════════════════════════ BOOKS ═══════════════════════════ */
+    #books{padding:28px;gap:20px;max-width:680px;margin:0 auto;width:100%}
+    .books-header h2{font-size:20px;font-weight:500;margin-bottom:4px}
+    .books-header p{font-size:13px;color:var(--muted);line-height:1.5}
 
-    /* ── TOAST ── */
-    .toast {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: #1e1e2a;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 13px;
-      opacity: 0;
-      transition: all 0.3s;
-      pointer-events: none;
-      z-index: 100;
+    .search-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:14px;outline:none;transition:border-color 0.2s}
+    .search-input:focus{border-color:var(--accent)}
+    .search-input::placeholder{color:var(--muted)}
+
+    .book-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color 0.2s}
+    .book-card.active{border-color:rgba(124,111,255,0.5)}
+    .book-card-header{display:flex;gap:16px;padding:20px;cursor:pointer;align-items:flex-start}
+    .book-cover{width:60px;height:76px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+    .book-meta{flex:1}
+    .book-title{font-size:15px;font-weight:600;margin-bottom:3px}
+    .book-author{font-size:12px;color:var(--muted);margin-bottom:8px}
+    .book-tag{display:inline-block;font-size:11px;color:var(--accent);background:rgba(124,111,255,0.1);padding:3px 10px;border-radius:20px}
+    .book-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+    .book-price{font-size:15px;font-weight:700;color:var(--text)}
+    .expand-icon{color:var(--muted);font-size:18px;transition:transform 0.3s;display:block;text-align:right;margin-top:4px}
+
+    .book-detail{display:none;border-top:1px solid var(--border);padding:0 20px 20px}
+    .book-detail.open{display:block}
+
+    .detail-section{margin-top:18px}
+    .detail-section h4{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+    .detail-section p,.detail-section li{font-size:13px;color:var(--muted);line-height:1.7}
+    .detail-section ul{padding-left:16px}
+    .detail-section li{margin-bottom:4px}
+
+    .sample-box{background:var(--bg);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;font-size:13px;color:var(--text);font-style:italic;line-height:1.7;margin-top:8px}
+
+    .book-actions-row{display:flex;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .priority-sel{background:var(--bg);border:1px solid var(--border);color:var(--muted);padding:8px 12px;border-radius:8px;font-size:12px;outline:none;cursor:pointer;flex:1;min-width:130px}
+    .add-book-btn{background:var(--accent);color:#fff;border:none;padding:9px 22px;border-radius:20px;font-size:13px;cursor:pointer;transition:background 0.2s;white-space:nowrap}
+    .add-book-btn:hover{background:#9487ff}
+    .add-book-btn.done{background:#1a2a1a;color:var(--green);border:1px solid var(--green);cursor:default}
+    .hear-sample-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:9px 16px;border-radius:20px;font-size:12px;cursor:pointer;transition:all 0.2s}
+    .hear-sample-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* ═══════════════════════════ DAY ═══════════════════════════ */
+    #day{padding:28px;gap:20px;max-width:560px;margin:0 auto;width:100%}
+    #day h2{font-size:20px;font-weight:500}
+    #day .sub{font-size:13px;color:var(--muted)}
+
+    .timeline{display:flex;flex-direction:column;gap:0}
+    .time-slot{display:flex;gap:16px;position:relative}
+    .time-slot:not(:last-child) .slot-line{position:absolute;left:27px;top:52px;bottom:0;width:1px;background:var(--border)}
+    .slot-dot{width:56px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:14px}
+    .dot{width:12px;height:12px;border-radius:50%;background:var(--border);border:2px solid var(--border);transition:all 0.3s}
+    .dot.done{background:var(--green);border-color:var(--green)}
+    .dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 10px rgba(124,111,255,0.5)}
+    .slot-time{font-size:10px;color:var(--muted);margin-top:4px;text-align:center}
+
+    .slot-content{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;flex:1;transition:border-color 0.2s}
+    .slot-content:hover{border-color:rgba(124,111,255,0.3)}
+    .slot-name{font-size:14px;font-weight:600;margin-bottom:4px}
+    .slot-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+    .slot-trigger{background:none;border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all 0.2s}
+    .slot-trigger:hover{border-color:var(--accent);color:var(--accent)}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c1c2c;border:1px solid var(--border);color:var(--text);padding:12px 22px;border-radius:10px;font-size:13px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* MODAL */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-bg.open{display:flex}
+    .modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto}
+    .modal h3{font-size:18px;font-weight:600;margin-bottom:6px}
+    .modal .sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+    .modal-close{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;margin-top:-4px}
+
+    @media(max-width:480px){
+      .mood-grid{grid-template-columns:1fr 1fr}
+      .alarm-time-display{font-size:48px}
+      nav{padding:14px 16px}
+      .tab-btn{padding:7px 10px;font-size:12px}
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
 <nav>
   <span class="logo">gnowme</span>
-  <div class="nav-links">
-    <button class="nav-btn active" onclick="showPage('home', this)">Home</button>
-    <button class="nav-btn" onclick="showPage('gallery', this)">Books</button>
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showPage('home',this)">Home</button>
+    <button class="tab-btn" onclick="showPage('alarm',this)">Alarm</button>
+    <button class="tab-btn" onclick="showPage('books',this)">Books</button>
+    <button class="tab-btn" onclick="showPage('day',this)">My Day</button>
   </div>
 </nav>
 
-<!-- HOME -->
+<!-- ═══════ HOME ═══════ -->
 <section class="page active" id="home">
-  <div class="orb-container">
-    <div class="orb-ring"></div>
-    <div class="orb-ring"></div>
-    <div class="orb-ring"></div>
-    <div class="orb" onclick="requestGuidance()" title="Tap for guidance"></div>
+  <div class="orb-wrap">
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="orb" id="orb" onclick="toggleListen()">🎙</div>
   </div>
 
-  <div class="home-label">
-    <h1>Good to have you back.</h1>
-    <p>Tap the orb for a moment of clarity, or browse your consciousness modules below.</p>
+  <div class="voice-status" id="voiceStatus">Tap the orb to speak, or request guidance below</div>
+
+  <div class="active-modules" id="activePills"></div>
+
+  <div class="guidance-card" id="guidanceCard">
+    Your consciousness modules are ready. Tap the orb to begin…
   </div>
 
-  <div class="guidance-box" id="guidanceBox">
-    Tap the orb whenever you need to reset…
+  <div class="home-actions">
+    <button class="btn-primary" onclick="requestGuidance()">Request Guidance</button>
+    <button class="btn-secondary" onclick="morningFlow()">Morning Flow</button>
   </div>
-
-  <button class="speak-btn" onclick="requestGuidance()">Request Guidance</button>
 </section>
 
-<!-- GALLERY -->
-<section class="page" id="gallery">
-  <h2>Consciousness Gallery</h2>
-  <p class="sub">Choose the books that shape your mindset. Active modules guide you throughout the day.</p>
+<!-- ═══════ ALARM ═══════ -->
+<section class="page" id="alarm">
+  <div class="alarm-hero">
+    <div class="alarm-time-display" id="alarmDisplay">06:30</div>
+    <div class="alarm-row">
+      <span class="alarm-label">Wake-up alarm</span>
+      <label class="alarm-toggle">
+        <input type="checkbox" id="alarmToggle" onchange="toggleAlarm()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <input type="time" class="time-picker" id="timePicker" value="06:30" onchange="updateAlarmTime(this.value)" />
+  </div>
 
-  <input class="search-bar" type="text" placeholder="Search books or mindset types…" oninput="filterBooks(this.value)" />
+  <div class="alarm-status" id="alarmStatus"></div>
 
-  <div class="books-grid" id="booksGrid"></div>
+  <span class="section-title">Morning Mood</span>
+  <div class="mood-grid" id="moodGrid">
+    <div class="mood-card selected" onclick="selectMood(this,'calm')" data-mood="calm">
+      <span class="mood-emoji">🌊</span>
+      <span class="mood-name">Calm</span>
+      <span class="mood-desc">Soft breath, gentle entry into the day</span>
+    </div>
+    <div class="mood-card" onclick="selectMood(this,'driven')" data-mood="driven">
+      <span class="mood-emoji">🔥</span>
+      <span class="mood-name">Driven</span>
+      <span class="mood-desc">Energised, purposeful, ready to move</span>
+    </div>
+    <div class="mood-card" onclick="selectMood(this,'focused')" data-mood="focused">
+      <span class="mood-emoji">🎯</span>
+      <span class="mood-name">Focused</span>
+      <span class="mood-desc">Clear mind, sharp intention, no noise</span>
+    </div>
+    <div class="mood-card" onclick="selectMood(this,'stoic')" data-mood="stoic">
+      <span class="mood-emoji">🏛️</span>
+      <span class="mood-name">Stoic</span>
+      <span class="mood-desc">Grounded, unshakeable, composed</span>
+    </div>
+    <div class="mood-card" onclick="selectMood(this,'grateful')" data-mood="grateful">
+      <span class="mood-emoji">✨</span>
+      <span class="mood-name">Grateful</span>
+      <span class="mood-desc">Abundant mindset, appreciation first</span>
+    </div>
+    <div class="mood-card" onclick="selectMood(this,'warrior')" data-mood="warrior">
+      <span class="mood-emoji">⚔️</span>
+      <span class="mood-name">Warrior</span>
+      <span class="mood-desc">Strategic, decisive, no hesitation</span>
+    </div>
+  </div>
+
+  <span class="section-title">Morning Script Preview</span>
+  <div class="preview-box" id="previewBox">
+    Choose a mood above, then tap Preview to hear your morning guidance…
+  </div>
+  <div style="display:flex;gap:10px">
+    <button class="btn-primary" onclick="previewMorning()" style="flex:1">Preview Morning Flow</button>
+    <button class="btn-secondary" onclick="stopSpeech()" style="padding:13px 18px">Stop</button>
+  </div>
 </section>
+
+<!-- ═══════ BOOKS ═══════ -->
+<section class="page" id="books">
+  <div class="books-header">
+    <h2>Consciousness Gallery</h2>
+    <p>Each book becomes part of how Gnowme guides your thinking, reactions, and resilience all day long.</p>
+  </div>
+  <input class="search-input" type="text" placeholder="Search books or mindset…" oninput="filterBooks(this.value)" />
+  <div id="booksGrid" style="display:flex;flex-direction:column;gap:12px"></div>
+</section>
+
+<!-- ═══════ DAY ═══════ -->
+<section class="page" id="day">
+  <h2>My Day</h2>
+  <p class="sub">Gnowme guides you from the moment you wake until you rest. Tap any slot to receive guidance now.</p>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<!-- BOOK DETAIL MODAL -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <h3 id="modalTitle"></h3>
+    <p class="sub" id="modalSub"></p>
+    <div id="modalBody"></div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── State ────────────────────────────────────────────────────────────────────
+const state = {
+  activeBooks: JSON.parse(localStorage.getItem('gnowme_books') || '{}'),
+  alarmTime: localStorage.getItem('gnowme_alarm') || '06:30',
+  alarmOn: localStorage.getItem('gnowme_alarm_on') === 'true',
+  mood: localStorage.getItem('gnowme_mood') || 'calm',
+  listening: false,
+  speaking: false,
+};
+
+// ─── Books Data ───────────────────────────────────────────────────────────────
 const BOOKS = [
   {
-    id: "rich_dad_poor_dad",
-    title: "Rich Dad Poor Dad",
-    author: "Robert Kiyosaki",
-    price: 12.99,
-    category: "Financial Mindset",
-    emoji: "💰",
-    color: "#1a1a0f",
-    consciousness: "Asset-focused thinking, making money work for you, long-term wealth building."
+    id: 'rich_dad_poor_dad', title: 'Rich Dad Poor Dad', author: 'Robert Kiyosaki',
+    price: 12.99, category: 'Financial Mindset', emoji: '💰', bg: '#1a160a',
+    tagline: 'Make money work for you — not the other way around.',
+    what: 'This module installs the financial lens of Robert Kiyosaki\'s Rich Dad. It trains you to see every decision through the question: is this an asset or a liability? It builds the mental habit of thinking in cash flow, not just income.',
+    how: [
+      'Before financial decisions, Gnowme will ask: "Is this working for you, or are you working for it?"',
+      'When stress around money rises, it reframes toward long-term asset thinking',
+      'It quietly reinforces the identity: you are an investor, not just an earner',
+    ],
+    sample: '"You\'re looking at this expense. Rich Dad asks one thing — does it put money in your pocket or take it out? That clarity is your answer. The choice is yours from here."',
+    morning: 'Today you wake up as someone who makes money work. Every choice is either building your freedom or delaying it. Which side does today\'s first decision fall on?'
   },
   {
-    id: "art_of_war",
-    title: "The Art of War",
-    author: "Sun Tzu",
-    price: 9.99,
-    category: "Strategic Calm",
-    emoji: "⚔️",
-    color: "#0f1a1a",
-    consciousness: "Composure under pressure, strategic patience, winning without unnecessary conflict."
+    id: 'art_of_war', title: 'The Art of War', author: 'Sun Tzu',
+    price: 9.99, category: 'Strategic Calm', emoji: '⚔️', bg: '#0a100a',
+    tagline: 'Win by composure. The greatest victory needs no conflict.',
+    what: 'Sun Tzu\'s wisdom becomes your strategic mind. This module teaches you to choose your battles, stay composed under pressure, read situations before reacting, and conserve energy for what truly matters.',
+    how: [
+      'In high-pressure moments, Gnowme slows you down with a single question: "What is the actual objective here?"',
+      'Before confrontations or negotiations, it primes strategic patience',
+      'It reframes reactive impulses into calculated responses',
+    ],
+    sample: '"The tension is building. Sun Tzu reminds you — supreme excellence is not winning every fight. It\'s knowing which fights to win. Stay composed. The moment is yours to read."',
+    morning: 'The strategist wakes before the battle begins. Today, see the board before you move any piece. Patience is not weakness — it is the sharpest weapon.'
   },
   {
-    id: "atomic_habits",
-    title: "Atomic Habits",
-    author: "James Clear",
-    price: 14.99,
-    category: "Discipline & Growth",
-    emoji: "⚡",
-    color: "#1a1a0f",
-    consciousness: "Small consistent actions, identity-based change, building systems that last."
+    id: 'atomic_habits', title: 'Atomic Habits', author: 'James Clear',
+    price: 14.99, category: 'Discipline & Growth', emoji: '⚡', bg: '#0a0a1a',
+    tagline: 'You don\'t rise to your goals. You fall to your systems.',
+    what: 'James Clear\'s system replaces willpower with identity. This module stops you from chasing goals and instead reinforces who you are becoming. Every small action is reframed as a vote for your future self.',
+    how: [
+      'When you feel resistance to a habit, Gnowme speaks your identity: "This is what people like you do."',
+      'It celebrates 1% moments — the small wins that compound',
+      'It gently calls you back when you drift, without judgment',
+    ],
+    sample: '"Every action right now is a vote for the person you want to be. You don\'t have to be perfect — you just have to cast the vote. One rep. One word. One step. That\'s enough."',
+    morning: 'The person you\'re becoming wakes up slightly differently today. One small thing — done with intention. That\'s the whole game. What\'s your first vote?'
   },
   {
-    id: "meditations",
-    title: "Meditations",
-    author: "Marcus Aurelius",
-    price: 8.99,
-    category: "Stoic Resilience",
-    emoji: "🏛️",
-    color: "#1a0f1a",
-    consciousness: "Inner composure, duty over comfort, what you control vs what you don't."
+    id: 'meditations', title: 'Meditations', author: 'Marcus Aurelius',
+    price: 8.99, category: 'Stoic Resilience', emoji: '🏛️', bg: '#100a1a',
+    tagline: 'The obstacle is the way. Your mind is your fortress.',
+    what: 'Marcus Aurelius wrote to himself every morning to stay grounded. This module brings that same internal discipline. It teaches you to distinguish what you control, accept what you cannot, and act with total clarity.',
+    how: [
+      'When external chaos rises, Gnowme returns you to the inner citadel: "What here is actually yours to control?"',
+      'It builds the habit of morning reflection and evening review',
+      'Emotional reactions are met with: "Is this worthy of disturbing your peace?"',
+    ],
+    sample: '"Something outside you is pulling your attention. Marcus asks — is it truly in your control? If not, it deserves none of your peace. Return to what you can shape. Begin there."',
+    morning: 'You wake as a leader of yourself first. What would the emperor do this morning? He would rise, be useful, do the work in front of him, and waste nothing — especially not his mind.'
   },
   {
-    id: "power_of_now",
-    title: "The Power of Now",
-    author: "Eckhart Tolle",
-    price: 11.99,
-    category: "Present Awareness",
-    emoji: "🌊",
-    color: "#0f1a1a",
-    consciousness: "Releasing past and future anxiety, presence as the foundation of strength."
-  }
+    id: 'power_of_now', title: 'The Power of Now', author: 'Eckhart Tolle',
+    price: 11.99, category: 'Present Awareness', emoji: '🌊', bg: '#0a1010',
+    tagline: 'The present moment is the only place your life actually happens.',
+    what: 'Eckhart Tolle dissolves the tyranny of past regret and future anxiety. This module trains Gnowme to bring you back to the present whenever your mind escapes into narrative loops, worry, or rumination.',
+    how: [
+      'When anxiety or overthinking is detected, Gnowme anchors you: "Right now, in this breath — what is actually happening?"',
+      'It dissolves urgency by returning you to the only time that exists',
+      'It separates you from your thoughts without suppressing them',
+    ],
+    sample: '"Your mind has gone somewhere else — past or future. Neither exists right now. Come back. Feel your feet. Take one breath. This moment is your home. Everything else is thought."',
+    morning: 'Before the day begins — this breath. Before any thought — this moment. You are already here. Let that be enough to start from.'
+  },
 ];
 
-const activeModules = {};
+const MOODS = {
+  calm: { music: [174,396], scripts: [
+    'The morning is gentle today. No rush. Let the breath arrive first — slow, easy, complete. You are waking into a day that is already on your side. Take a moment to feel the quiet before the world begins.',
+    'Good morning. There is nothing urgent in this first breath. Let your body arrive before your mind races ahead. Today begins with stillness — and from stillness, everything else flows.'
+  ]},
+  driven: { music: [528,741], scripts: [
+    'Rise. Today has been waiting for you. The work you are here to do does not pause — and neither do you. Feel that energy already moving in your body. This is your day. Start with intention.',
+    'You are awake. That means today begins now. Every driven person knows — the first hour shapes everything that follows. Get up with purpose. Move like someone who has already decided to win.'
+  ]},
+  focused: { music: [396,528], scripts: [
+    'One thing. That is all today requires — one thing done with complete attention. Before the noise arrives, choose it now. Everything else falls around that single point of clarity.',
+    'The focused mind is already clear. Before checking anything, before responding to anyone — decide what matters most today. Name it now. Guard it fiercely. Everything else is secondary.'
+  ]},
+  stoic: { music: [174,285], scripts: [
+    'Marcus Aurelius rose each morning knowing the day would bring difficulty. He rose anyway — not despite it, but because of it. You are the same. The day is uncertain. You are not.',
+    'The Stoic does not ask for an easy day. They ask for the strength to meet whatever comes. Rise with that. You already have what you need. The question is only whether you will use it.'
+  ]},
+  grateful: { music: [528,639], scripts: [
+    'Before a single thought of what needs doing — pause. Three things that are already right. Your breath is one of them. Your mind working is another. The fact that you are here, awake, is the third.',
+    'Gratitude is not a feeling you wait for. It is a decision you make before the day gets going. What is already working? Name it now. Build from there. Today already has gifts in it.'
+  ]},
+  warrior: { music: [396,741], scripts: [
+    'The warrior does not wait to feel ready. The warrior decides. Sun Tzu knew — the battle is won before it begins, in the mind. You have already won this morning by choosing to rise with intention.',
+    'You are awake before most. That is the first victory. Now — what is the objective today? Name it like a general. No vagueness. Clarity of purpose is your sharpest weapon. Use it now.'
+  ]},
+};
 
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
+const DAY_SLOTS = [
+  { name: 'Morning Wake', time: '06:30', dot: 'active', desc: 'Voice-guided wake-up with music and mindset calibration. Sets the tone for your entire day.', trigger: 'Wake Me Up' },
+  { name: 'Morning Intention', time: '07:15', dot: 'active', desc: 'Set your one clear intention before the day\'s noise arrives. What matters most today?', trigger: 'Set Intention' },
+  { name: 'Mid-Morning Reset', time: '10:00', dot: '', desc: 'A 20-second check-in. Is your energy still aligned with your intention? Recalibrate if needed.', trigger: 'Check In Now' },
+  { name: 'Midday Anchor', time: '12:30', dot: '', desc: 'Before you eat — pause. A short grounding from your active consciousness modules.', trigger: 'Ground Me' },
+  { name: 'Afternoon Focus', time: '15:00', dot: '', desc: 'The dip hits here. Gnowme speaks to your energy, not your schedule. Stay in the work.', trigger: 'Refocus' },
+  { name: 'Evening Reflection', time: '19:00', dot: '', desc: 'What happened today that deserves recognition? What is tomorrow already asking for?', trigger: 'Reflect' },
+  { name: 'Wind Down', time: '21:30', dot: '', desc: 'Release the day. Let go of what didn\'t happen. Rest is part of the work.', trigger: 'Wind Down' },
+];
+
+// ─── Audio Engine ─────────────────────────────────────────────────────────────
+let audioCtx, oscillators = [];
+
+function startAmbientMusic(mood) {
+  stopAmbientMusic();
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const freqs = MOODS[mood]?.music || [174, 396];
+  freqs.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 800;
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.04 / freqs.length, audioCtx.currentTime + 6);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    oscillators.push({osc, gain});
+  });
 }
 
-function renderBooks(filter = "") {
+function stopAmbientMusic() {
+  oscillators.forEach(({osc, gain}) => {
+    try { gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.5); setTimeout(() => osc.stop(), 2000); } catch(e){}
+  });
+  oscillators = [];
+}
+
+// ─── Speech ───────────────────────────────────────────────────────────────────
+const synth = window.speechSynthesis;
+let recognition;
+
+function speak(text, onEnd) {
+  synth.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.82;
+  utt.pitch = 0.92;
+  utt.volume = 1;
+  // Pick a calm voice if available
+  const voices = synth.getVoices();
+  const preferred = voices.find(v => v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('Karen'));
+  if (preferred) utt.voice = preferred;
+  utt.onend = onEnd || null;
+  state.speaking = true;
+  setOrbState('speaking');
+  utt.onend = () => { state.speaking = false; setOrbState('idle'); if(onEnd) onEnd(); };
+  synth.speak(utt);
+}
+
+function stopSpeech() {
+  synth.cancel();
+  stopAmbientMusic();
+  state.speaking = false;
+  setOrbState('idle');
+}
+
+function setOrbState(s) {
+  const orb = document.getElementById('orb');
+  orb.classList.remove('listening','speaking');
+  const vs = document.getElementById('voiceStatus');
+  if (s === 'listening') { orb.classList.add('listening'); orb.textContent = '👂'; vs.textContent = 'Listening… speak now'; vs.classList.add('active'); }
+  else if (s === 'speaking') { orb.classList.add('speaking'); orb.textContent = '💬'; vs.textContent = 'Speaking…'; vs.classList.add('active'); }
+  else { orb.textContent = '🎙'; vs.textContent = 'Tap the orb to speak, or request guidance below'; vs.classList.remove('active'); }
+}
+
+function toggleListen() {
+  if (state.speaking) { stopSpeech(); return; }
+  if (state.listening) { stopListening(); return; }
+  startListening();
+}
+
+function startListening() {
+  if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+    toast('Voice input not supported in this browser — use Chrome or Safari');
+    return;
+  }
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.onresult = (e) => {
+    const heard = e.results[0][0].transcript;
+    stopListening();
+    processVoiceInput(heard);
+  };
+  recognition.onerror = () => { stopListening(); toast('Could not hear you — try again'); };
+  recognition.onend = () => { if(state.listening) stopListening(); };
+  recognition.start();
+  state.listening = true;
+  setOrbState('listening');
+}
+
+function stopListening() {
+  try { recognition && recognition.stop(); } catch(e) {}
+  state.listening = false;
+  setOrbState('idle');
+}
+
+async function processVoiceInput(heard) {
+  const card = document.getElementById('guidanceCard');
+  card.textContent = `You said: "${heard}"`;
+  card.classList.add('live');
+  await fetchAndSpeak({ user_input: heard });
+}
+
+// ─── Guidance ─────────────────────────────────────────────────────────────────
+async function requestGuidance() {
+  const card = document.getElementById('guidanceCard');
+  card.textContent = 'Drawing from your consciousness modules…';
+  card.classList.remove('live');
+  await fetchAndSpeak({ user_input: 'I need a moment of clarity and guidance' });
+}
+
+async function morningFlow() {
+  const mood = state.mood;
+  const scripts = MOODS[mood]?.scripts || MOODS.calm.scripts;
+  const script = scripts[Math.floor(Math.random() * scripts.length)];
+  const card = document.getElementById('guidanceCard');
+  card.textContent = script;
+  card.classList.add('live');
+  startAmbientMusic(mood);
+  speak(script, () => { setTimeout(stopAmbientMusic, 3000); });
+}
+
+async function fetchAndSpeak(extra = {}) {
+  const card = document.getElementById('guidanceCard');
+  try {
+    const res = await fetch('/speak/guidance', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:'koya', bio_state:{}, context:{ work_summary:'daily life', agent_context:true }, ...extra })
+    });
+    const data = await res.json();
+    card.textContent = data.monologue;
+    card.classList.add('live');
+    speak(data.monologue);
+  } catch {
+    const fallback = 'What you cannot control is already gone. What you can control is right here, right now. One steady step is enough.';
+    card.textContent = fallback;
+    card.classList.add('live');
+    speak(fallback);
+  }
+}
+
+// ─── Alarm ────────────────────────────────────────────────────────────────────
+function updateAlarmTime(val) {
+  state.alarmTime = val;
+  localStorage.setItem('gnowme_alarm', val);
+  document.getElementById('alarmDisplay').textContent = val;
+  if (state.alarmOn) refreshAlarmStatus();
+}
+
+function toggleAlarm() {
+  state.alarmOn = document.getElementById('alarmToggle').checked;
+  localStorage.setItem('gnowme_alarm_on', state.alarmOn);
+  refreshAlarmStatus();
+}
+
+function refreshAlarmStatus() {
+  const el = document.getElementById('alarmStatus');
+  if (state.alarmOn) {
+    el.textContent = `⏰ Alarm set for ${state.alarmTime} — ${state.mood} mood`;
+    el.classList.add('active');
+  } else {
+    el.classList.remove('active');
+  }
+}
+
+function selectMood(el, mood) {
+  document.querySelectorAll('.mood-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.mood = mood;
+  localStorage.setItem('gnowme_mood', mood);
+  if (state.alarmOn) refreshAlarmStatus();
+}
+
+function previewMorning() {
+  const mood = state.mood;
+  const scripts = MOODS[mood]?.scripts || MOODS.calm.scripts;
+  const script = scripts[0];
+  const preview = document.getElementById('previewBox');
+  preview.textContent = script;
+  preview.classList.add('loaded');
+  startAmbientMusic(mood);
+  speak(script, () => { setTimeout(stopAmbientMusic, 2000); });
+}
+
+// Check alarm every 30s
+setInterval(() => {
+  if (!state.alarmOn) return;
+  const now = new Date();
+  const [h, m] = state.alarmTime.split(':').map(Number);
+  if (now.getHours() === h && now.getMinutes() === m && now.getSeconds() < 30) {
+    triggerAlarm();
+  }
+}, 30000);
+
+function triggerAlarm() {
+  const mood = state.mood;
+  const scripts = MOODS[mood]?.scripts || MOODS.calm.scripts;
+  const script = scripts[Math.floor(Math.random() * scripts.length)];
+  startAmbientMusic(mood);
+  setTimeout(() => {
+    speak(script, () => { setTimeout(stopAmbientMusic, 4000); });
+  }, 4000); // music plays for 4s first
+}
+
+// ─── Books ────────────────────────────────────────────────────────────────────
+function renderBooks(filter = '') {
   const grid = document.getElementById('booksGrid');
   const filtered = BOOKS.filter(b =>
-    !filter ||
-    b.title.toLowerCase().includes(filter.toLowerCase()) ||
-    b.category.toLowerCase().includes(filter.toLowerCase()) ||
-    b.consciousness.toLowerCase().includes(filter.toLowerCase())
+    !filter || [b.title, b.category, b.what, b.tagline].some(s => s.toLowerCase().includes(filter.toLowerCase()))
   );
   grid.innerHTML = filtered.map(book => `
-    <div class="book-card ${activeModules[book.id] ? 'active-module' : ''}" id="card-${book.id}">
-      <div class="book-cover" style="background:${book.color}">${book.emoji}</div>
-      <div class="book-info">
-        <div class="book-title">${book.title}</div>
-        <div class="book-author">${book.author}</div>
-        <span class="book-tag">${book.category}</span>
-        <div class="book-consciousness">${book.consciousness}</div>
+    <div class="book-card ${state.activeBooks[book.id] ? 'active' : ''}" id="book-${book.id}">
+      <div class="book-card-header" onclick="toggleBookDetail('${book.id}')">
+        <div class="book-cover" style="background:${book.bg}">${book.emoji}</div>
+        <div class="book-meta">
+          <div class="book-title">${book.title}</div>
+          <div class="book-author">${book.author}</div>
+          <span class="book-tag">${book.category}</span>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px;font-style:italic">${book.tagline}</div>
+        </div>
+        <div class="book-right">
+          <span class="book-price">$${book.price.toFixed(2)}</span>
+          ${state.activeBooks[book.id] ? '<span style="font-size:11px;color:var(--green);font-weight:600">● ACTIVE</span>' : ''}
+          <span class="expand-icon" id="icon-${book.id}">▾</span>
+        </div>
       </div>
-      <div class="book-actions">
-        <span class="book-price">$${book.price.toFixed(2)}</span>
-        <select class="priority-select" id="priority-${book.id}">
-          <option value="primary">Primary</option>
-          <option value="background">Background</option>
-        </select>
-        <button class="add-btn ${activeModules[book.id] ? 'added' : ''}"
-          id="btn-${book.id}"
-          onclick="addBook('${book.id}', '${book.title}')"
-          ${activeModules[book.id] ? 'disabled' : ''}>
-          ${activeModules[book.id] ? '✓ Active' : 'Add'}
-        </button>
+      <div class="book-detail" id="detail-${book.id}">
+        <div class="detail-section">
+          <h4>What this consciousness does</h4>
+          <p>${book.what}</p>
+        </div>
+        <div class="detail-section">
+          <h4>How it integrates into you</h4>
+          <ul>${book.how.map(h => `<li>${h}</li>`).join('')}</ul>
+        </div>
+        <div class="detail-section">
+          <h4>Sample guidance you'll hear</h4>
+          <div class="sample-box">${book.sample}</div>
+        </div>
+        <div class="book-actions-row">
+          <select class="priority-sel" id="priority-${book.id}">
+            <option value="primary">Primary consciousness</option>
+            <option value="background">Background influence</option>
+          </select>
+          <button class="hear-sample-btn" onclick="hearSample('${book.id}')">▶ Hear Sample</button>
+          <button class="add-book-btn ${state.activeBooks[book.id] ? 'done' : ''}"
+            id="addbtn-${book.id}"
+            onclick="${state.activeBooks[book.id] ? '' : `addBook('${book.id}')`}"
+            ${state.activeBooks[book.id] ? 'disabled' : ''}>
+            ${state.activeBooks[book.id] ? '✓ Active' : 'Add to My Consciousness'}
+          </button>
+        </div>
       </div>
     </div>
   `).join('');
 }
 
-function filterBooks(val) { renderBooks(val); }
+function toggleBookDetail(id) {
+  const detail = document.getElementById(`detail-${id}`);
+  const icon = document.getElementById(`icon-${id}`);
+  const isOpen = detail.classList.contains('open');
+  document.querySelectorAll('.book-detail').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.expand-icon').forEach(i => { i.textContent = '▾'; i.style.transform = ''; });
+  if (!isOpen) {
+    detail.classList.add('open');
+    icon.textContent = '▴';
+  }
+}
 
-async function addBook(bookId, title) {
+async function addBook(bookId) {
+  const book = BOOKS.find(b => b.id === bookId);
   const priority = document.getElementById(`priority-${bookId}`)?.value || 'primary';
   try {
     const res = await fetch('/books/add', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: 'koya', book_id: bookId, priority })
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:'koya', book_id:bookId, priority })
     });
-    const data = await res.json();
-    if (data.status === 'success') {
-      activeModules[bookId] = priority;
-      renderBooks();
-      showToast(`"${title}" added as ${priority} module`);
-    }
-  } catch (e) {
-    showToast('Could not connect to backend');
-  }
+    await res.json();
+  } catch(e) {}
+  state.activeBooks[bookId] = priority;
+  localStorage.setItem('gnowme_books', JSON.stringify(state.activeBooks));
+  renderBooks();
+  renderActivePills();
+  toast(`"${book.title}" added as ${priority} consciousness`);
 }
 
-async function requestGuidance() {
-  const box = document.getElementById('guidanceBox');
-  box.textContent = 'Listening…';
-  box.classList.remove('speaking');
-  try {
-    const res = await fetch('/speak/guidance', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: 'koya',
-        bio_state: {},
-        context: { work_summary: 'daily work and focus', agent_context: true },
-        user_input: 'needing a moment of clarity'
-      })
-    });
-    const data = await res.json();
-    box.textContent = data.monologue;
-    box.classList.add('speaking');
-  } catch (e) {
-    box.textContent = 'What you cannot control is already gone. What you can control is right here, right now.';
-    box.classList.add('speaking');
-  }
+function hearSample(bookId) {
+  const book = BOOKS.find(b => b.id === bookId);
+  if (book) speak(book.sample);
 }
 
-function showToast(msg) {
+function filterBooks(val) { renderBooks(val); }
+
+function renderActivePills() {
+  const pills = document.getElementById('activePills');
+  const active = Object.keys(state.activeBooks);
+  pills.innerHTML = active.map(id => {
+    const b = BOOKS.find(x => x.id === id);
+    return b ? `<span class="module-pill">${b.emoji} ${b.title.split(' ').slice(0,2).join(' ')}</span>` : '';
+  }).join('');
+}
+
+// ─── Day Timeline ─────────────────────────────────────────────────────────────
+function renderTimeline() {
+  const now = new Date();
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = DAY_SLOTS.map((slot, i) => {
+    const [h, m] = slot.time.split(':').map(Number);
+    const slotTime = new Date(); slotTime.setHours(h, m, 0);
+    const isPast = now > slotTime;
+    const isCurrent = Math.abs(now - slotTime) < 45 * 60000;
+    const dotClass = isCurrent ? 'active' : isPast ? 'done' : '';
+    return `
+      <div class="time-slot">
+        <div class="slot-line"></div>
+        <div class="slot-dot">
+          <div class="dot ${dotClass}"></div>
+          <span class="slot-time">${slot.time}</span>
+        </div>
+        <div class="slot-content">
+          <div class="slot-name">${slot.name}</div>
+          <div class="slot-desc">${slot.desc}</div>
+          <button class="slot-trigger" onclick="triggerSlot(${i})">${slot.trigger}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function triggerSlot(i) {
+  const slot = DAY_SLOTS[i];
+  if (i === 0) { morningFlow(); return; }
+  const msgs = {
+    1: 'Before the day\'s noise arrives — what is the one thing that matters most today? Name it now. Guard it.',
+    2: 'A moment to check in. Is your energy still aligned with your intention? Breathe. Recalibrate. Continue.',
+    3: 'Before this meal, pause. Three breaths. You are building something. This rest is part of the work.',
+    4: 'The afternoon dip is normal. Your energy is asking for a moment of steadiness, not more speed. Slow down to speed up.',
+    5: 'The day is completing itself. What happened today that deserves recognition — even something small? Name it.',
+    6: 'Let the day go now. What didn\'t happen is already done. Rest is not the absence of work — it is part of it.',
+  };
+  const text = msgs[i] || 'Take a breath. Stay present. One step at a time.';
+  document.getElementById('guidanceCard') && (document.getElementById('guidanceCard').textContent = text);
+  speak(text);
+  showPage('home', document.querySelector('.tab-btn'));
+}
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function closeModal(e) { if (e.target === document.getElementById('modalBg')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalBg').classList.remove('open'); stopSpeech(); }
+
+function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(() => t.classList.remove('show'), 3200);
 }
 
+// ─── Init ─────────────────────────────────────────────────────────────────────
+document.getElementById('timePicker').value = state.alarmTime;
+document.getElementById('alarmDisplay').textContent = state.alarmTime;
+document.getElementById('alarmToggle').checked = state.alarmOn;
+document.querySelector(`[data-mood="${state.mood}"]`)?.classList.add('selected');
+document.querySelectorAll('.mood-card').forEach(c => { if (c.dataset.mood !== state.mood) c.classList.remove('selected'); });
+if (state.alarmOn) refreshAlarmStatus();
+synth.onvoiceschanged = () => {};
 renderBooks();
+renderActivePills();
+renderTimeline();
 </script>
 </body>
 </html>
