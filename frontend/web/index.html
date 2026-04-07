@@ -817,6 +817,13 @@ function stopMusic() {
   _nodes = [];
 }
 function stopAll() {
+  // If speech was running and interrupted before finishing, send learning signal
+  if (isSpeaking && _speakStartedAt) {
+    const elapsed = Date.now() - _speakStartedAt;
+    if (elapsed < 4000) sendFeedback({ interrupted: true });
+    else                sendFeedback({ skipped_fast: true });
+    _speakStartedAt = null;
+  }
   stopMusic();
   window.speechSynthesis.cancel();
   if (recog) { try { recog.stop(); } catch {} recog = null; }
@@ -870,10 +877,30 @@ function setDisplay(text, live = false) {
   box.classList.toggle('live', live);
 }
 
+// Track whether current speech finished naturally (for learning feedback)
+let _speakStartedAt = null;
+let _speakText      = '';
+
 function displayAndSpeak(text) {
   goPage('home', document.querySelector('.tab[data-page="home"]'));
   setDisplay(text, true);
-  speak(text);
+  _speakText      = text;
+  _speakStartedAt = Date.now();
+  speak(text, () => {
+    // Speech ended naturally — user heard it fully
+    const elapsed = Date.now() - (_speakStartedAt || Date.now());
+    if (elapsed > 3000) sendFeedback({ followed: true });
+    _speakStartedAt = null;
+  });
+}
+
+function sendFeedback(flags) {
+  // Non-blocking fire-and-forget to the learning endpoint
+  fetch('/feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: 'koya', ...flags }),
+  }).catch(() => {});
 }
 
 // ═══════════════════════════════════════════════════════════
