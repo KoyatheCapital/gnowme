@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -10,10 +10,11 @@ from core.internal_monologue import InternalMonologueGenerator
 from intelligence.consciousness_translator import ConsciousnessTranslator
 from voice.voxtral import GnowmeVoice
 from core.agent_schema import AgentContextPayload
+from core import speech_engine
 
 app = FastAPI(title="Gnowme")
 
-# Serve the web frontend
+# Serve web frontend
 _frontend = os.path.join(os.path.dirname(__file__), "..", "frontend", "web")
 if os.path.isdir(_frontend):
     app.mount("/static", StaticFiles(directory=_frontend), name="static")
@@ -24,127 +25,162 @@ async def serve_ui():
 
 voice_engine = GnowmeVoice(Config.MISTRAL_API_KEY, Config.USER_VOICE_REF)
 
-# In-memory stores (replace with proper session/DB in production)
-translators: Dict[str, ConsciousnessTranslator] = {}
-monologue_generators: Dict[str, InternalMonologueGenerator] = {}
+translators:  Dict[str, ConsciousnessTranslator]   = {}
+generators:   Dict[str, InternalMonologueGenerator] = {}
+voice_paths:  Dict[str, str] = {}  # user_id → wav path
 
-def get_translator(user_id: str) -> ConsciousnessTranslator:
-    if user_id not in translators:
-        translators[user_id] = ConsciousnessTranslator(user_id)
-    return translators[user_id]
+def get_translator(uid: str) -> ConsciousnessTranslator:
+    if uid not in translators:
+        translators[uid] = ConsciousnessTranslator(uid)
+    return translators[uid]
 
-def get_monologue_generator(user_id: str) -> InternalMonologueGenerator:
-    if user_id not in monologue_generators:
-        monologue_generators[user_id] = InternalMonologueGenerator(user_id)
-    return monologue_generators[user_id]
+def get_generator(uid: str) -> InternalMonologueGenerator:
+    if uid not in generators:
+        generators[uid] = InternalMonologueGenerator(uid)
+    return generators[uid]
 
-# ====================== BOOK GALLERY ======================
+# ══════════════════════════ MORNING WAKE SEQUENCE ══════════════════════════
+
+class WakeStepRequest(BaseModel):
+    user_id: str
+    step: int = 0
+
+@app.post("/morning/wake/step")
+async def wake_step(request: WakeStepRequest):
+    """Return the next line(s) in the morning wake sequence."""
+    step = speech_engine.get_wake_step(request.step)
+    return {
+        "step": request.step,
+        "id": step["id"],
+        "lines": step["lines"],
+        "wait_for_response": step["wait_for_response"],
+        "done": step["id"] == "done",
+        "script": "\n".join(step["lines"]),
+    }
+
+# ══════════════════════════ GUIDANCE ══════════════════════════
+
+class GuidanceRequest(BaseModel):
+    user_id: str
+    bio_state: Dict[str, Any] = {}
+    context:   Dict[str, Any] = {}
+    user_input: str = ""
+
+@app.post("/speak/guidance")
+async def speak_guidance(request: GuidanceRequest):
+    gen = get_generator(request.user_id)
+    monologue = await gen.generate(request.bio_state, request.context, request.user_input)
+    return {"monologue": monologue}
+
+@app.post("/morning/flow")
+async def morning_flow(request: GuidanceRequest):
+    gen = get_generator(request.user_id)
+    monologue = await gen.morning_flow(request.bio_state, request.context)
+    return {"monologue": monologue}
+
+@app.post("/speak/midday")
+async def midday(request: GuidanceRequest):
+    gen = get_generator(request.user_id)
+    monologue = await gen.midday(request.bio_state, request.context)
+    return {"monologue": monologue}
+
+@app.post("/speak/decision")
+async def decision_moment(request: GuidanceRequest):
+    gen = get_generator(request.user_id)
+    monologue = await gen.decision_moment(request.bio_state, request.context)
+    return {"monologue": monologue}
+
+@app.post("/speak/evening")
+async def evening(request: GuidanceRequest):
+    gen = get_generator(request.user_id)
+    monologue = await gen.evening(request.bio_state, request.context)
+    return {"monologue": monologue}
+
+# ══════════════════════════ BOOKS ══════════════════════════
 
 class AddBookRequest(BaseModel):
     user_id: str
     book_id: str
     source_path: str | None = None
-    priority: str = "primary"  # "primary" or "background"
+    priority: str = "primary"
 
 @app.post("/books/add")
 async def add_book(request: AddBookRequest):
     try:
-        translator = get_translator(request.user_id)
-        translator.activate_book(request.book_id, request.source_path, priority=request.priority)
+        t = get_translator(request.user_id)
+        t.activate_book(request.book_id, request.source_path, priority=request.priority)
         return {
             "status": "success",
-            "message": f"Consciousness module '{request.book_id}' added as {request.priority}.",
-            "active_books": translator.active_books,
-            "background_books": translator.background_books
+            "active_books": t.active_books,
+            "background_books": t.background_books,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-class BookRecommendationRequest(BaseModel):
+# ══════════════════════════ VOICE CLONE ══════════════════════════
+
+class VoiceCloneRequest(BaseModel):
     user_id: str
 
-@app.post("/books/recommend")
-async def recommend_books(request: BookRecommendationRequest):
-    """Personalized book recommendations based on recent context"""
-    return {
-        "recommended": ["art_of_war", "rich_dad_poor_dad"],
-        "reason": "Recent high-stakes situations and financial decision points detected in your activity.",
-        "message": "These consciousness modules may help you stay composed and focused on long-term value."
-    }
+@app.post("/voice/clone")
+async def clone_voice(user_id: str, file: UploadFile = File(...)):
+    """Upload voice WAV → store as user reference for Voxtral TTS."""
+    try:
+        os.makedirs("data/voice", exist_ok=True)
+        path = f"data/voice/{user_id}_ref.wav"
+        content = await file.read()
+        with open(path, "wb") as f:
+            f.write(content)
+        voice_paths[user_id] = path
+        return {
+            "status": "success",
+            "message": "Voice cloned. All guidance will now sound like you.",
+            "voice_path": path,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-# ====================== AGENT CONTEXT ======================
+@app.get("/voice/status/{user_id}")
+async def voice_status(user_id: str):
+    has_voice = os.path.exists(f"data/voice/{user_id}_ref.wav")
+    return {"has_voice": has_voice, "user_id": user_id}
+
+# ══════════════════════════ AGENTS ══════════════════════════
 
 @app.post("/agents/context")
 async def ingest_agent_context(payload: AgentContextPayload):
-    """High-level context from agents — better human mindset timing"""
     try:
-        generator = get_monologue_generator(payload.user_id)
+        gen = get_generator(payload.user_id)
         context = {
             "work_summary": payload.work_summary,
             "detected_human_state": payload.detected_human_state,
             "activity_type": payload.current_activity_type,
             "domain": payload.domain,
-            "agent_context": True
+            "agent_context": True,
         }
-        monologue = await generator.real_time_flow({}, context, payload.work_summary)
-        audio = await voice_engine.speak(monologue)
-        return {
-            "status": "received",
-            "human_guidance_generated": True,
-            "monologue_preview": monologue[:250] + "..."
-        }
+        monologue = await gen.real_time_flow({}, context, payload.work_summary)
+        return {"status": "received", "monologue_preview": monologue[:200]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ====================== GUIDANCE ======================
-
-class GuidanceRequest(BaseModel):
-    user_id: str
-    bio_state: Dict[str, Any] = {}
-    context: Dict[str, Any] = {}
-    user_input: str = ""
-
-@app.post("/speak/guidance")
-async def speak_guidance(request: GuidanceRequest):
-    generator = get_monologue_generator(request.user_id)
-    monologue = await generator.generate(request.bio_state, request.context, request.user_input)
-    audio = await voice_engine.speak(monologue)
-    return {"monologue": monologue, "audio_length": len(audio)}
-
-@app.post("/morning/flow")
-async def morning_flow(request: GuidanceRequest):
-    generator = get_monologue_generator(request.user_id)
-    monologue = await generator.morning_flow(request.bio_state, request.context)
-    audio = await voice_engine.speak(monologue)
-    return {"monologue": monologue, "audio_length": len(audio)}
-
-# ====================== CONFLICT RESOLUTION ======================
+# ══════════════════════════ CONFLICT ══════════════════════════
 
 class ConflictResponse(BaseModel):
     user_id: str
-    user_choice: str       # e.g. "rich_dad_poor_dad"
+    user_choice: str
     original_context: Dict
 
 @app.post("/conflict/resolve")
 async def resolve_conflict(request: ConflictResponse):
-    """User chooses primary consciousness when conflict is detected"""
-    try:
-        generator = get_monologue_generator(request.user_id)
-        monologue = await generator.handle_conflict_response(
-            request.user_id,
-            request.user_choice,
-            request.original_context
-        )
-        audio = await voice_engine.speak(monologue)
-        return {"status": "resolved", "monologue": monologue}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    gen = get_generator(request.user_id)
+    monologue = await gen.handle_conflict_response(request.user_id, request.user_choice, request.original_context)
+    return {"status": "resolved", "monologue": monologue}
 
-# ====================== HEALTH ======================
+# ══════════════════════════ HEALTH ══════════════════════════
 
 @app.get("/")
 async def root():
-    return {"message": "Gnowme is running with full safety layers and conflict handling."}
+    return {"status": "running"}
 
 if __name__ == "__main__":
     import uvicorn
