@@ -1,7 +1,14 @@
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
+from llama_index.embeddings.mistralai import MistralAIEmbedding
 from llama_index.vector_stores.postgres import PGVectorStore
 from sqlalchemy import make_url
 from config import Config
+
+# Use Mistral embeddings — no OpenAI key required
+Settings.embed_model = MistralAIEmbedding(
+    model_name="mistral-embed",
+    api_key=Config.MISTRAL_API_KEY,
+)
 
 class UserRAG:
     def __init__(self, user_id: str):
@@ -13,7 +20,7 @@ class UserRAG:
             port=url.port or 5432,
             user=url.username or "postgres",
             table_name=f"gnowme_user_{user_id}_knowledge",
-            embed_dim=1536,
+            embed_dim=1024,  # mistral-embed dimension
         )
         self.index = VectorStoreIndex.from_vector_store(self.vector_store)
 

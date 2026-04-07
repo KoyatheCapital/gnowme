@@ -4,6 +4,7 @@ python-dotenv
 mistralai
 llama-index
 llama-index-vector-stores-postgres
+llama-index-embeddings-mistralai
 sqlalchemy
 psycopg2-binary
 pydantic
