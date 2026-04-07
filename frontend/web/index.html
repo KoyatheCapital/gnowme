@@ -2,329 +2,645 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 <title>Gnowme</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+/* ── Reset + Variables ─────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#07070d;--bg2:#0d0d18;--card:#11111c;--border:#1a1a28;
-  --orb:#7c6fff;--orb2:#b49fff;--text:#e6e6f2;--muted:#52526a;
-  --green:#3ddc84;--red:#ff6b6b;--gold:#f5c542;
+  --bg:#07070d;--bg2:#0c0c18;--card:#10101b;--card2:#141422;
+  --border:#1c1c2e;--border2:#252538;
+  --orb:#7c6fff;--orb2:#b49fff;--orb3:#4c3fcc;
+  --text:#e8e8f4;--sub:#9090b0;--muted:#484860;
+  --green:#3ddc84;--red:#ff6060;--gold:#f5c542;--cyan:#60d0ff;
 }
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  display:flex;flex-direction:column;overflow-x:hidden;
+}
 
-/* ── NAV ── */
-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--border);background:rgba(7,7,13,0.95);backdrop-filter:blur(16px);position:sticky;top:0;z-index:60}
-.logo{font-size:16px;font-weight:700;letter-spacing:0.1em;color:var(--orb2);text-transform:uppercase}
-.tabs{display:flex;gap:2px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:3px}
-.tab{background:none;border:none;color:var(--muted);padding:7px 14px;border-radius:7px;font-size:12px;cursor:pointer;transition:all 0.2s;white-space:nowrap;letter-spacing:0.02em}
-.tab.on{background:var(--orb);color:#fff}
+/* ── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
-/* ── PAGES ── */
-.page{display:none;flex:1;flex-direction:column}
+/* ── Nav ───────────────────────────────────────────── */
+nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  background:rgba(7,7,13,0.96);backdrop-filter:blur(20px);
+  position:sticky;top:0;z-index:100;flex-shrink:0;
+}
+.logo{font-size:14px;font-weight:800;letter-spacing:0.15em;color:var(--orb2);text-transform:uppercase}
+.logo span{color:var(--muted);font-weight:400}
+.tabs{display:flex;gap:2px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:3px}
+.tab{
+  background:none;border:none;color:var(--muted);
+  padding:7px 13px;border-radius:9px;font-size:12px;
+  cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;white-space:nowrap;
+}
+.tab:hover{color:var(--sub)}
+.tab.on{background:var(--orb);color:#fff;font-weight:500}
+.tab .badge{
+  display:inline-block;background:var(--orb3);color:var(--orb2);
+  font-size:9px;padding:1px 5px;border-radius:10px;margin-left:4px;
+  vertical-align:middle;font-weight:700;
+}
+.tab.on .badge{background:rgba(255,255,255,0.25);color:#fff}
+
+/* ── Pages ─────────────────────────────────────────── */
+.page{display:none;flex-direction:column;flex:1;overflow-y:auto}
 .page.on{display:flex}
 
-/* ══════════════════════ SETUP ══════════════════════ */
-#setup{align-items:center;justify-content:center;padding:40px 24px;gap:32px;min-height:calc(100vh - 57px)}
-.setup-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:20px}
-.setup-card h2{font-size:22px;font-weight:500;line-height:1.3}
-.setup-card p{font-size:13px;color:var(--muted);line-height:1.7}
-.script-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px 20px;font-size:13px;line-height:1.8;color:var(--text);font-style:italic}
-.rec-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--orb);color:#fff;border:none;padding:14px 24px;border-radius:50px;font-size:15px;cursor:pointer;transition:all 0.2s;font-weight:500}
-.rec-btn.recording{background:#c04444;animation:rec-pulse 1s ease-in-out infinite}
-@keyframes rec-pulse{0%,100%{opacity:1}50%{opacity:0.7}}
-.rec-timer{font-size:13px;color:var(--muted);text-align:center;min-height:20px}
-.rec-status{font-size:12px;color:var(--green);text-align:center;min-height:18px}
-.skip-link{font-size:12px;color:var(--muted);text-align:center;cursor:pointer;text-decoration:underline}
-.skip-link:hover{color:var(--text)}
+/* ════════════════════ HOME ════════════════════════ */
+#home{align-items:center;padding:32px 20px 40px;gap:24px;min-height:calc(100vh - 57px)}
 
-/* ══════════════════════ HOME ══════════════════════ */
-#home{align-items:center;justify-content:center;gap:28px;padding:40px 24px;min-height:calc(100vh - 57px)}
+.home-greeting{font-size:13px;color:var(--sub);letter-spacing:0.03em;text-align:center}
+.home-greeting strong{color:var(--text)}
 
-.orb-wrap{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center}
-.ring{position:absolute;border-radius:50%;border:1px solid rgba(124,111,255,0.12);animation:ring-anim 4s ease-in-out infinite}
-.ring:nth-child(1){width:220px;height:220px}
-.ring:nth-child(2){width:168px;height:168px;animation-delay:.8s}
-.ring:nth-child(3){width:116px;height:116px;animation-delay:1.6s}
-@keyframes ring-anim{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.1;transform:scale(1.03)}}
-.orb{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 36% 36%,var(--orb2),var(--orb));
-  box-shadow:0 0 48px rgba(124,111,255,.45),0 0 96px rgba(124,111,255,.18);
-  animation:breathe 4s ease-in-out infinite;cursor:pointer;z-index:1;position:relative;
-  display:flex;align-items:center;justify-content:center;font-size:30px;transition:box-shadow .3s}
-.orb.listening{animation:pulse .7s ease-in-out infinite;background:radial-gradient(circle at 36% 36%,#ffa0ff,#a040ff)}
-.orb.speaking{animation:pulse 1.1s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.16)}}
+.orb-scene{position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(124,111,255,0.1);animation:ring-pulse 4s ease-in-out infinite}
+.ring:nth-child(1){width:200px;height:200px;animation-delay:0s}
+.ring:nth-child(2){width:156px;height:156px;animation-delay:0.9s}
+.ring:nth-child(3){width:112px;height:112px;animation-delay:1.8s}
+@keyframes ring-pulse{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:0.08;transform:scale(1.04)}}
+.orb{
+  width:84px;height:84px;border-radius:50%;z-index:2;cursor:pointer;
+  background:radial-gradient(circle at 34% 34%,var(--orb2),var(--orb) 60%,var(--orb3));
+  box-shadow:0 0 40px rgba(124,111,255,.5),0 0 80px rgba(124,111,255,.18);
+  animation:orb-breathe 4s ease-in-out infinite;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  transition:box-shadow .3s,transform .2s;position:relative;
+}
+.orb:hover{transform:scale(1.04)}
+.orb.listening{
+  animation:orb-pulse .7s ease-in-out infinite;
+  background:radial-gradient(circle at 34% 34%,#e090ff,#9040e0);
+  box-shadow:0 0 50px rgba(180,80,255,.6);
+}
+.orb.speaking{
+  animation:orb-pulse 1.1s ease-in-out infinite;
+  box-shadow:0 0 50px rgba(124,111,255,.7);
+}
+@keyframes orb-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes orb-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
 
-.state-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.state-pill{font-size:11px;padding:4px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted)}
-.state-pill.hi{border-color:var(--green);color:var(--green)}
-.state-pill.lo{border-color:var(--red);color:var(--red)}
+.orb-hint{font-size:11px;color:var(--muted);text-align:center;transition:color .3s;letter-spacing:0.03em}
+.orb-hint.active{color:var(--orb2)}
 
-.voice-hint{font-size:12px;color:var(--muted);text-align:center;min-height:18px;transition:color .3s}
-.voice-hint.active{color:var(--orb2)}
+.state-pills{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;min-height:28px}
+.pill{
+  font-size:10px;padding:4px 11px;border-radius:20px;
+  background:var(--card);border:1px solid var(--border);color:var(--muted);
+  letter-spacing:0.04em;transition:all .3s;
+}
+.pill.hi{border-color:rgba(61,220,132,.4);color:var(--green);background:rgba(61,220,132,.05)}
+.pill.lo{border-color:rgba(255,96,96,.4);color:var(--red);background:rgba(255,96,96,.05)}
+.pill.mid{border-color:rgba(180,159,255,.35);color:var(--orb2);background:rgba(124,111,255,.05)}
 
-.speech-display{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;max-width:400px;width:100%;min-height:90px;font-size:14px;line-height:1.85;color:var(--muted);transition:color .4s;white-space:pre-wrap}
-.speech-display.live{color:var(--text);border-color:rgba(124,111,255,.3)}
+.speech-box{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:20px 22px;width:100%;max-width:420px;min-height:96px;
+  font-size:14px;line-height:1.9;color:var(--muted);
+  white-space:pre-wrap;transition:all .4s;
+}
+.speech-box.live{color:var(--text);border-color:rgba(124,111,255,.28)}
+.speech-box .user-line{color:var(--sub);font-size:12px;margin-bottom:8px;font-style:italic}
 
-.home-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.btn-p{background:var(--orb);color:#fff;border:none;padding:13px 26px;border-radius:50px;font-size:14px;cursor:pointer;transition:all .2s;font-weight:500}
-.btn-p:hover{background:#9487ff;transform:translateY(-1px)}
-.btn-s{background:var(--card);color:var(--text);border:1px solid var(--border);padding:12px 22px;border-radius:50px;font-size:14px;cursor:pointer;transition:all .2s}
-.btn-s:hover{border-color:var(--orb);color:var(--orb2)}
+.home-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;max-width:420px}
+.btn-primary{
+  background:var(--orb);color:#fff;border:none;
+  padding:12px 22px;border-radius:50px;font-size:13px;
+  cursor:pointer;transition:all .2s;font-weight:500;
+}
+.btn-primary:hover{background:var(--orb2);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{
+  background:var(--card);color:var(--text);border:1px solid var(--border);
+  padding:11px 18px;border-radius:50px;font-size:13px;cursor:pointer;transition:all .2s;
+}
+.btn-secondary:hover{border-color:var(--orb);color:var(--orb2)}
+.btn-ghost{
+  background:none;color:var(--muted);border:1px solid var(--border2);
+  padding:9px 14px;border-radius:50px;font-size:12px;cursor:pointer;transition:all .2s;
+}
+.btn-ghost:hover{border-color:var(--orb);color:var(--orb2)}
 
-.active-mods{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:400px}
-.mod-pill{font-size:11px;padding:4px 12px;border-radius:20px;background:rgba(124,111,255,.1);border:1px solid rgba(124,111,255,.25);color:var(--orb2)}
+.active-modules{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;max-width:420px;min-height:24px}
+.mod-chip{
+  font-size:10px;padding:3px 10px;border-radius:20px;
+  background:rgba(124,111,255,.1);border:1px solid rgba(124,111,255,.22);
+  color:var(--orb2);letter-spacing:0.02em;
+}
+.no-modules{font-size:11px;color:var(--muted);text-align:center}
 
-/* ══════════════════════ ALARM ══════════════════════ */
-#alarm{padding:28px;max-width:520px;margin:0 auto;width:100%;gap:20px}
+/* ════════════════════ WAKE MODAL ══════════════════ */
+.wake-overlay{
+  position:fixed;inset:0;background:rgba(7,7,13,.98);z-index:500;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:28px;padding:40px 32px;
+}
+.wake-overlay.on{display:flex}
+.wake-orb{
+  width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle at 34% 34%,var(--orb2),var(--orb));
+  box-shadow:0 0 60px rgba(124,111,255,.6);
+  animation:orb-breathe 4s ease-in-out infinite;flex-shrink:0;
+}
+.wake-progress{display:flex;gap:6px}
+.wp-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .3s}
+.wp-dot.done{background:var(--orb)}
+.wp-dot.now{background:var(--orb2);box-shadow:0 0 6px rgba(180,159,255,.8)}
+.wake-text{
+  font-size:21px;font-weight:300;text-align:center;line-height:2;
+  max-width:340px;white-space:pre-wrap;color:var(--text);
+  min-height:100px;transition:opacity .4s;
+}
+.wake-actions{display:flex;flex-direction:column;align-items:center;gap:12px}
+.wake-btn{
+  background:var(--orb);color:#fff;border:none;
+  padding:14px 36px;border-radius:50px;font-size:15px;
+  cursor:pointer;transition:all .2s;font-weight:500;
+  display:none;
+}
+.wake-btn:hover{background:var(--orb2)}
+.wake-close{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline}
+.wake-close:hover{color:var(--sub)}
 
-.alarm-hero{background:linear-gradient(135deg,var(--card),#110e20);border:1px solid var(--border);border-radius:20px;padding:30px;display:flex;flex-direction:column;align-items:center;gap:16px}
-.alarm-clock{font-size:60px;font-weight:200;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+/* ════════════════════ ALARM ═══════════════════════ */
+#alarm{padding:24px;gap:18px;max-width:520px;margin:0 auto;width:100%}
+
+.alarm-card{
+  background:linear-gradient(135deg,var(--card),#0e0b1e);
+  border:1px solid var(--border);border-radius:22px;
+  padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.alarm-live-clock{font-size:52px;font-weight:200;letter-spacing:.05em;font-variant-numeric:tabular-nums;color:var(--text)}
+.alarm-live-clock .am-pm{font-size:18px;color:var(--sub);margin-left:6px}
+.alarm-set-time{font-size:14px;color:var(--sub)}
+.alarm-set-time strong{color:var(--orb2)}
+
 .alarm-row{display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px}
-.alarm-lbl{font-size:13px;color:var(--muted)}
-.toggle-wrap{position:relative;width:52px;height:28px;cursor:pointer}
-.toggle-wrap input{opacity:0;width:0;height:0}
-.slider{position:absolute;inset:0;background:var(--border);border-radius:28px;transition:.3s}
-.slider:before{content:'';position:absolute;width:20px;height:20px;left:4px;top:4px;background:#fff;border-radius:50%;transition:.3s}
-.toggle-wrap input:checked+.slider{background:var(--orb)}
-.toggle-wrap input:checked+.slider:before{transform:translateX(24px)}
-.time-input{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 16px;color:var(--text);font-size:26px;font-weight:300;outline:none;width:170px;text-align:center;cursor:pointer;transition:border-color .2s}
-.time-input:focus{border-color:var(--orb)}
+.alarm-label{font-size:13px;color:var(--sub)}
 
-.sec-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+/* Toggle */
+.toggle{position:relative;width:50px;height:27px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:27px;transition:.3s}
+.toggle-track:before{
+  content:'';position:absolute;width:19px;height:19px;
+  left:4px;top:4px;background:#fff;border-radius:50%;transition:.3s;
+}
+.toggle input:checked+.toggle-track{background:var(--orb)}
+.toggle input:checked+.toggle-track:before{transform:translateX(23px)}
+
+.time-pick{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:10px 16px;color:var(--text);font-size:24px;font-weight:300;
+  outline:none;width:160px;text-align:center;cursor:pointer;
+  transition:border-color .2s;font-variant-numeric:tabular-nums;
+}
+.time-pick:focus{border-color:var(--orb)}
+
+.sec-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
 
 .mood-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.mood{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px}
-.mood:hover,.mood.on{border-color:var(--orb);background:rgba(124,111,255,.07)}
+.mood-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:14px 8px;text-align:center;cursor:pointer;
+  transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+.mood-card:hover{border-color:var(--border2);background:var(--card2)}
+.mood-card.on{border-color:var(--orb);background:rgba(124,111,255,.08)}
 .mood-ico{font-size:22px}
-.mood-nm{font-size:12px;font-weight:600}
-.mood-dc{font-size:10px;color:var(--muted);line-height:1.4}
+.mood-name{font-size:12px;font-weight:600;color:var(--text)}
+.mood-desc{font-size:10px;color:var(--muted);line-height:1.4}
 
-.preview-area{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;font-size:13px;line-height:1.8;color:var(--muted);min-height:80px;white-space:pre-wrap;font-style:italic}
-.preview-area.loaded{color:var(--text);font-style:normal}
-.alarm-active-msg{text-align:center;font-size:13px;padding:10px 16px;border-radius:10px;background:rgba(61,220,132,.08);border:1px solid rgba(61,220,132,.2);color:var(--green);display:none}
-.alarm-active-msg.on{display:block}
-.row2{display:flex;gap:10px}
+.preview-box{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:16px 18px;font-size:13px;line-height:1.9;color:var(--muted);
+  min-height:72px;white-space:pre-wrap;font-style:italic;transition:all .3s;
+}
+.preview-box.loaded{color:var(--text);font-style:normal;border-color:rgba(124,111,255,.2)}
 
-/* ══════════════════════ WAKE FLOW (modal) ══════════════════════ */
-.wake-modal{position:fixed;inset:0;background:rgba(7,7,13,.97);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:40px}
-.wake-modal.on{display:flex}
-.wake-orb{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 36% 36%,var(--orb2),var(--orb));box-shadow:0 0 60px rgba(124,111,255,.6);animation:breathe 4s ease-in-out infinite}
-.wake-text{font-size:22px;font-weight:300;text-align:center;line-height:1.9;max-width:360px;white-space:pre-wrap;color:var(--text);min-height:80px}
-.wake-respond{background:var(--card);border:1px solid var(--border);border-radius:50px;padding:13px 28px;font-size:15px;cursor:pointer;color:var(--text);transition:all .2s}
-.wake-respond:hover{border-color:var(--orb);color:var(--orb2)}
-.wake-skip{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline}
+.alarm-active{
+  text-align:center;font-size:12px;padding:10px 16px;border-radius:10px;
+  background:rgba(61,220,132,.06);border:1px solid rgba(61,220,132,.2);color:var(--green);
+  display:none;
+}
+.alarm-active.on{display:block}
+.alarm-actions{display:flex;gap:8px}
 
-/* ══════════════════════ BOOKS ══════════════════════ */
-#books{padding:24px;gap:16px;max-width:660px;margin:0 auto;width:100%}
-.books-hd h2{font-size:20px;font-weight:500;margin-bottom:4px}
-.books-hd p{font-size:13px;color:var(--muted);line-height:1.5}
-.search{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 16px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
-.search:focus{border-color:var(--orb)}
-.search::placeholder{color:var(--muted)}
+/* ════════════════════ BOOKS ═══════════════════════ */
+#books{padding:22px;gap:14px;max-width:640px;margin:0 auto;width:100%}
 
-.book{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s}
-.book.active-book{border-color:rgba(124,111,255,.45)}
-.book-hd{display:flex;gap:14px;padding:18px;cursor:pointer;align-items:flex-start}
-.cover{width:58px;height:74px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
-.book-info{flex:1}
-.book-title{font-size:15px;font-weight:600;margin-bottom:2px}
-.book-auth{font-size:12px;color:var(--muted);margin-bottom:7px}
-.book-tag{display:inline-block;font-size:10px;color:var(--orb2);background:rgba(124,111,255,.1);padding:2px 9px;border-radius:20px;margin-bottom:6px}
-.book-tagline{font-size:12px;color:var(--muted);font-style:italic;line-height:1.4}
-.book-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.price{font-size:15px;font-weight:700}
-.active-badge{font-size:10px;color:var(--green);font-weight:700;letter-spacing:.04em}
-.chevron{color:var(--muted);font-size:16px;transition:transform .3s;margin-top:2px}
+.books-header{display:flex;flex-direction:column;gap:6px}
+.books-header h2{font-size:20px;font-weight:500}
+.books-header p{font-size:13px;color:var(--sub);line-height:1.5}
+.books-stats{display:flex;gap:10px;margin-top:4px}
+.bstat{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted)}
+.bstat.lit{color:var(--green);border-color:rgba(61,220,132,.3)}
+
+.search-bar{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:11px 16px;color:var(--text);font-size:14px;outline:none;
+  transition:border-color .2s;width:100%;
+}
+.search-bar:focus{border-color:var(--orb)}
+.search-bar::placeholder{color:var(--muted)}
+
+.book-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .2s}
+.book-card.active{border-color:rgba(124,111,255,.4)}
+.book-header{display:flex;gap:14px;padding:18px;cursor:pointer;align-items:flex-start}
+.book-cover{
+  width:56px;height:72px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;
+}
+.book-meta{flex:1;min-width:0}
+.book-title{font-size:15px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.book-author{font-size:12px;color:var(--muted);margin-bottom:6px}
+.book-cat{display:inline-block;font-size:10px;color:var(--orb2);background:rgba(124,111,255,.1);padding:2px 8px;border-radius:20px;margin-bottom:5px}
+.book-tagline{font-size:12px;color:var(--sub);font-style:italic;line-height:1.4}
+.book-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.book-price{font-size:14px;font-weight:700;color:var(--text)}
+.book-active-badge{font-size:9px;color:var(--green);font-weight:700;letter-spacing:.04em}
+.book-chevron{color:var(--muted);font-size:14px;transition:transform .3s}
 
 .book-body{display:none;border-top:1px solid var(--border);padding:0 18px 18px}
 .book-body.open{display:block}
-.dsec{margin-top:16px}
-.dsec h4{font-size:10px;font-weight:800;color:var(--orb2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px}
-.dsec p,.dsec li{font-size:13px;color:var(--muted);line-height:1.75}
-.dsec ul{padding-left:16px}
-.dsec li{margin-bottom:4px}
-.sample{background:var(--bg);border-left:3px solid var(--orb);padding:12px 16px;border-radius:0 8px 8px 0;font-size:13px;color:var(--text);font-style:italic;line-height:1.8;margin-top:6px;white-space:pre-wrap}
-.book-actions{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap}
-.priority-sel{background:var(--bg);border:1px solid var(--border);color:var(--muted);padding:8px 10px;border-radius:8px;font-size:12px;outline:none;cursor:pointer;flex:1;min-width:130px}
-.hear-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.hear-btn:hover{border-color:var(--orb);color:var(--orb2)}
-.add-btn{background:var(--orb);color:#fff;border:none;padding:9px 20px;border-radius:20px;font-size:12px;cursor:pointer;transition:background .2s;white-space:nowrap}
-.add-btn:hover{background:#9487ff}
-.add-btn.done{background:#162216;color:var(--green);border:1px solid var(--green);cursor:default}
+.detail-section{margin-top:16px}
+.detail-section h4{font-size:10px;font-weight:800;color:var(--orb2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.detail-section p,.detail-section li{font-size:13px;color:var(--sub);line-height:1.8}
+.detail-section ul{padding-left:16px}
+.detail-section li{margin-bottom:3px}
+.sample-quote{
+  background:var(--bg);border-left:3px solid var(--orb);
+  padding:12px 16px;border-radius:0 10px 10px 0;
+  font-size:13px;color:var(--text);font-style:italic;
+  line-height:1.9;margin-top:4px;white-space:pre-wrap;
+}
+.book-actions-row{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap}
+.priority-select{
+  background:var(--bg);border:1px solid var(--border);color:var(--sub);
+  padding:8px 10px;border-radius:10px;font-size:12px;outline:none;cursor:pointer;flex:1;min-width:120px;
+}
+.hear-sample-btn{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  padding:8px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;
+}
+.hear-sample-btn:hover{border-color:var(--orb);color:var(--orb2)}
+.add-book-btn{
+  background:var(--orb);color:#fff;border:none;
+  padding:9px 18px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;
+}
+.add-book-btn:hover{background:var(--orb2)}
+.add-book-btn.added{background:rgba(61,220,132,.1);color:var(--green);border:1px solid rgba(61,220,132,.3);cursor:default}
 
-/* ══════════════════════ DAY ══════════════════════ */
-#day{padding:24px;gap:16px;max-width:520px;margin:0 auto;width:100%}
-#day h2{font-size:20px;font-weight:500}
-#day .sub{font-size:13px;color:var(--muted)}
-.tl{display:flex;flex-direction:column}
-.slot{display:flex;gap:14px;position:relative}
-.slot:not(:last-child) .sl{position:absolute;left:25px;top:48px;bottom:0;width:1px;background:var(--border)}
-.sl-left{width:52px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:12px}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--border);border:2px solid var(--border);transition:all .3s}
-.dot.past{background:var(--green);border-color:var(--green)}
-.dot.now{background:var(--orb);border-color:var(--orb);box-shadow:0 0 8px rgba(124,111,255,.6)}
-.sl-time{font-size:10px;color:var(--muted);margin-top:4px;text-align:center}
-.slot-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;flex:1;transition:border-color .2s}
-.slot-card:hover{border-color:rgba(124,111,255,.3)}
-.slot-name{font-size:14px;font-weight:600;margin-bottom:3px}
-.slot-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px}
-.slot-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s}
-.slot-btn:hover{border-color:var(--orb);color:var(--orb2)}
+/* ════════════════════ MY DAY ══════════════════════ */
+#day{padding:22px;gap:14px;max-width:500px;margin:0 auto;width:100%}
 
-/* ══════════════════════ SHARED ══════════════════════ */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:#18182a;border:1px solid var(--border);color:var(--text);padding:11px 20px;border-radius:10px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:300;white-space:nowrap}
+.day-header h2{font-size:20px;font-weight:500;margin-bottom:4px}
+.day-header p{font-size:13px;color:var(--sub)}
+.day-date{font-size:12px;color:var(--muted);margin-top:2px}
+
+.timeline{display:flex;flex-direction:column}
+.tl-slot{display:flex;gap:14px;position:relative}
+.tl-slot:not(:last-child)::after{
+  content:'';position:absolute;
+  left:25px;top:46px;bottom:0;
+  width:1px;background:var(--border);
+}
+.tl-left{width:50px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:14px}
+.tl-dot{
+  width:11px;height:11px;border-radius:50%;
+  background:var(--border2);border:2px solid var(--border);
+  transition:all .3s;z-index:1;
+}
+.tl-dot.past{background:var(--green);border-color:var(--green)}
+.tl-dot.now{background:var(--orb);border-color:var(--orb);box-shadow:0 0 10px rgba(124,111,255,.7);animation:dot-pulse 2s ease-in-out infinite}
+@keyframes dot-pulse{0%,100%{box-shadow:0 0 10px rgba(124,111,255,.7)}50%{box-shadow:0 0 18px rgba(124,111,255,.4)}}
+.tl-time{font-size:10px;color:var(--muted);margin-top:4px;text-align:center}
+.tl-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:14px 16px;margin-bottom:10px;flex:1;transition:border-color .2s;
+}
+.tl-card:hover{border-color:var(--border2)}
+.tl-card.now-card{border-color:rgba(124,111,255,.35);background:rgba(124,111,255,.04)}
+.tl-card.past-card{opacity:0.55}
+.tl-slot-name{font-size:14px;font-weight:600;margin-bottom:3px}
+.tl-slot-desc{font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:10px}
+.tl-slot-btn{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;
+}
+.tl-slot-btn:hover{border-color:var(--orb);color:var(--orb2)}
+.now-tag{
+  display:inline-block;font-size:9px;font-weight:700;color:var(--orb2);
+  background:rgba(124,111,255,.1);padding:2px 7px;border-radius:10px;
+  margin-left:8px;vertical-align:middle;letter-spacing:.04em;text-transform:uppercase;
+}
+
+/* ════════════════════ SETUP ════════════════════════ */
+#setup{padding:28px 22px;gap:20px;max-width:460px;margin:0 auto;width:100%}
+
+.setup-section{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:16px}
+.setup-section h3{font-size:17px;font-weight:600}
+.setup-section p{font-size:13px;color:var(--sub);line-height:1.7}
+
+.voice-status-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-radius:12px;
+  background:var(--bg);border:1px solid var(--border);
+}
+.voice-status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.voice-status-dot.active{background:var(--green);box-shadow:0 0 6px rgba(61,220,132,.6)}
+.voice-status-txt{font-size:13px;color:var(--sub);flex:1}
+
+.script-card{
+  background:var(--bg);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;font-size:13px;line-height:1.9;color:var(--sub);font-style:italic;
+}
+.record-row{display:flex;align-items:center;gap:10px}
+.rec-btn{
+  display:flex;align-items:center;gap:8px;
+  background:var(--orb);color:#fff;border:none;
+  padding:12px 22px;border-radius:50px;font-size:14px;cursor:pointer;
+  transition:all .2s;font-weight:500;flex:1;justify-content:center;
+}
+.rec-btn.recording{background:#c04040;animation:rec-blink 1s ease-in-out infinite}
+@keyframes rec-blink{0%,100%{opacity:1}50%{opacity:.75}}
+.rec-timer{font-size:13px;color:var(--muted);min-width:38px;text-align:right;font-variant-numeric:tabular-nums}
+.rec-status{font-size:12px;color:var(--green);text-align:center;min-height:20px}
+
+.setup-divider{height:1px;background:var(--border);margin:4px 0}
+
+.pref-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pref-label{font-size:13px;color:var(--sub)}
+.pref-select{
+  background:var(--bg);border:1px solid var(--border);color:var(--text);
+  padding:8px 12px;border-radius:10px;font-size:13px;outline:none;cursor:pointer;
+}
+
+/* ════════════════════ SHARED ═══════════════════════ */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--card2);border:1px solid var(--border2);color:var(--text);
+  padding:10px 18px;border-radius:12px;font-size:13px;
+  opacity:0;transition:all .3s;pointer-events:none;z-index:600;
+  white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+.section-title{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.1em;
+}
+
+/* ════════════════════ RESPONSIVE ═══════════════════ */
 @media(max-width:480px){
   .mood-grid{grid-template-columns:1fr 1fr}
-  .alarm-clock{font-size:48px}
-  .tabs .tab{padding:7px 9px;font-size:11px}
+  .alarm-live-clock{font-size:42px}
+  .tabs .tab{padding:6px 9px;font-size:11px}
+  .tab .badge{display:none}
+  nav{padding:12px 16px}
 }
 </style>
 </head>
 <body>
 
+<!-- ══════ NAV ══════ -->
 <nav>
-  <span class="logo">GNOWME</span>
+  <span class="logo">GNOW<span>ME</span></span>
   <div class="tabs">
-    <button class="tab on"  onclick="go('home',this)">Home</button>
-    <button class="tab"     onclick="go('alarm',this)">Alarm</button>
-    <button class="tab"     onclick="go('books',this)">Books</button>
-    <button class="tab"     onclick="go('day',this)">My Day</button>
+    <button class="tab" data-page="home" onclick="goPage('home',this)">Home</button>
+    <button class="tab" data-page="alarm" onclick="goPage('alarm',this)">Alarm</button>
+    <button class="tab" data-page="books" onclick="goPage('books',this)">Books <span class="badge" id="booksBadge">0</span></button>
+    <button class="tab" data-page="day" onclick="goPage('day',this)">My Day</button>
+    <button class="tab" data-page="setup" onclick="goPage('setup',this)">Setup</button>
   </div>
 </nav>
 
-<!-- ══════ SETUP ══════ -->
-<section class="page" id="setup">
-  <div class="setup-card">
-    <h2>Let's make Gnowme sound like you.</h2>
-    <p>Record 30–60 seconds of your natural speaking voice. This is used to clone your voice so every morning wake-up and all-day guidance sounds like your own internal thought — not an assistant.</p>
-    <div class="script-box">
-"Hello. This is my voice for Gnowme.<br><br>
-I speak calmly and clearly, at a natural pace.<br><br>
-Today I want to stay grounded and focused no matter what comes up.<br><br>
-When things get fast, I slow down. When things get loud, I get quiet.<br><br>
-This is my voice. This is how I think."
-    </div>
-    <div class="rec-timer" id="recTimer"></div>
-    <button class="rec-btn" id="recBtn" onclick="toggleRecord()">
-      <span id="recIcon">⏺</span> <span id="recLabel">Start Recording</span>
-    </button>
-    <div class="rec-status" id="recStatus"></div>
-    <div class="skip-link" onclick="skipSetup()">Skip for now — use system voice</div>
-  </div>
-</section>
-
-<!-- ══════ HOME ══════ -->
+<!-- ══════════════════════ HOME ══════════════════════ -->
 <section class="page" id="home">
-  <div class="orb-wrap">
+  <div class="home-greeting" id="greeting">Good morning</div>
+
+  <div class="orb-scene">
     <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-    <div class="orb" id="orb" onclick="toggleListen()">🎙</div>
+    <div class="orb" id="orb" onclick="orbTap()" title="Tap to speak">🎙</div>
   </div>
 
-  <div class="state-row" id="stateRow"></div>
-  <div class="voice-hint" id="vhint">Tap the orb to speak</div>
-  <div class="active-mods" id="activeMods"></div>
+  <div class="orb-hint" id="orbHint">Tap to speak</div>
 
-  <div class="speech-display" id="speechDisplay">
-…ready…
-
-tap the orb to speak, or request guidance below.
+  <div class="state-pills" id="statePills">
+    <span class="pill">Loading state…</span>
   </div>
 
-  <div class="home-btns">
-    <button class="btn-p" onclick="requestGuidance()">Guidance Now</button>
-    <button class="btn-s" onclick="decisionMode()">Decision Moment</button>
-    <button class="btn-s" onclick="startWakeFlow()">Morning Wake</button>
+  <div class="active-modules" id="activeMods">
+    <span class="no-modules">No consciousness modules active — add books to begin</span>
+  </div>
+
+  <div class="speech-box" id="speechBox">…ready…
+
+tap the orb and speak, or use a button below.</div>
+
+  <div class="home-actions">
+    <button class="btn-primary" onclick="getGuidance()">Guidance Now</button>
+    <button class="btn-secondary" onclick="decisionMode()">Decision Moment</button>
+    <button class="btn-secondary" onclick="startWake()">Morning Wake</button>
+  </div>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:-8px">
+    <button class="btn-ghost" onclick="eveningMode()">Evening Close</button>
+    <button class="btn-ghost" onclick="breatheMode()">Breathe</button>
+    <button class="btn-ghost" onclick="checkState()">Read State</button>
   </div>
 </section>
 
-<!-- ══════ WAKE FLOW MODAL ══════ -->
-<div class="wake-modal" id="wakeModal">
+<!-- ══════ WAKE MODAL ══════ -->
+<div class="wake-overlay" id="wakeOverlay">
   <div class="wake-orb"></div>
+  <div class="wake-progress" id="wakeProgress"></div>
   <div class="wake-text" id="wakeText"></div>
-  <button class="wake-respond" id="wakeBtn" onclick="wakeNext()" style="display:none">I'm up</button>
-  <div class="wake-skip" onclick="closeWake()">End session</div>
+  <div class="wake-actions">
+    <button class="wake-btn" id="wakeBtn" onclick="wakeNext()">I'm up →</button>
+    <span class="wake-close" onclick="closeWake()">End session</span>
+  </div>
 </div>
 
-<!-- ══════ ALARM ══════ -->
+<!-- ══════════════════════ ALARM ══════════════════════ -->
 <section class="page" id="alarm">
-  <div class="alarm-hero">
-    <div class="alarm-clock" id="alarmClock">06:30</div>
+
+  <div class="alarm-card">
+    <div class="alarm-live-clock" id="liveClock">--:--<span class="am-pm" id="liveAmPm"></span></div>
+    <div class="alarm-set-time" id="alarmSetLabel">Alarm: <strong>off</strong></div>
+
     <div class="alarm-row">
-      <span class="alarm-lbl">Wake-up alarm</span>
-      <label class="toggle-wrap">
-        <input type="checkbox" id="alarmOn" onchange="toggleAlarm()">
-        <span class="slider"></span>
+      <span class="alarm-label">Wake-up alarm</span>
+      <label class="toggle">
+        <input type="checkbox" id="alarmToggle" onchange="onAlarmToggle()">
+        <span class="toggle-track"></span>
       </label>
     </div>
-    <input type="time" class="time-input" id="timePick" value="06:30" onchange="setAlarmTime(this.value)"/>
+
+    <input type="time" class="time-pick" id="alarmTimePick" value="06:30" onchange="onAlarmTimeChange(this.value)"/>
   </div>
 
-  <div class="alarm-active-msg" id="alarmMsg"></div>
+  <div class="alarm-active" id="alarmActiveMsg"></div>
 
-  <span class="sec-lbl">Morning Mood</span>
+  <div class="section-title">
+    Morning Mood
+    <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">Sets music + voice tone</span>
+  </div>
   <div class="mood-grid" id="moodGrid"></div>
 
-  <span class="sec-lbl">Preview</span>
-  <div class="preview-area" id="previewArea">Choose a mood and tap Preview…</div>
-  <div class="row2">
-    <button class="btn-p" style="flex:1" onclick="previewAlarm()">Preview Morning</button>
-    <button class="btn-s" style="padding:13px 18px" onclick="stopAll()">Stop</button>
+  <div class="section-title">Preview</div>
+  <div class="preview-box" id="previewBox">Choose a mood and tap Preview Morning…</div>
+  <div class="alarm-actions">
+    <button class="btn-primary" style="flex:1" onclick="previewMorning()">▶ Preview Morning</button>
+    <button class="btn-secondary" style="padding:12px 18px" onclick="stopAll()">■ Stop</button>
   </div>
+
 </section>
 
-<!-- ══════ BOOKS ══════ -->
+<!-- ══════════════════════ BOOKS ══════════════════════ -->
 <section class="page" id="books">
-  <div class="books-hd">
+
+  <div class="books-header">
     <h2>Consciousness Modules</h2>
-    <p>Each book becomes part of how you think, decide, and regulate all day. Tap any book to see exactly how it integrates into you.</p>
+    <p>Each book becomes part of how you think, decide, and regulate — all day.</p>
+    <div class="books-stats">
+      <span class="bstat" id="bstatActive">0 active</span>
+      <span class="bstat">5 available</span>
+    </div>
   </div>
-  <input class="search" type="text" placeholder="Search books or mindset type…" oninput="filterBooks(this.value)"/>
-  <div id="bookGrid" style="display:flex;flex-direction:column;gap:10px"></div>
+
+  <input class="search-bar" type="text" id="bookSearch" placeholder="Search books, mindset type…" oninput="filterBooks(this.value)"/>
+
+  <div id="bookList" style="display:flex;flex-direction:column;gap:10px"></div>
+
 </section>
 
-<!-- ══════ DAY ══════ -->
+<!-- ══════════════════════ MY DAY ══════════════════════ -->
 <section class="page" id="day">
-  <h2>My Day</h2>
-  <p class="sub">From the moment you wake to when you sleep — tap any moment for guidance now.</p>
-  <div class="tl" id="timeline"></div>
+
+  <div class="day-header">
+    <h2>My Day</h2>
+    <p>Tap any moment for live guidance.</p>
+    <div class="day-date" id="dayDate"></div>
+  </div>
+
+  <div class="timeline" id="timeline"></div>
+
 </section>
 
+<!-- ══════════════════════ SETUP ══════════════════════ -->
+<section class="page" id="setup">
+
+  <div class="setup-section">
+    <h3>Voice Clone</h3>
+    <p>Record your natural speaking voice. Gnowme will use it so every wake-up and guidance session sounds like your own internal thought — not an assistant.</p>
+
+    <div class="voice-status-bar">
+      <div class="voice-status-dot" id="voiceStatusDot"></div>
+      <span class="voice-status-txt" id="voiceStatusTxt">No voice recorded yet — using system voice</span>
+    </div>
+
+    <div class="script-card">
+      "Hello. This is my voice for Gnowme.<br><br>
+      I speak calmly and clearly, at a natural pace.<br><br>
+      Today I want to stay grounded and focused no matter what comes up.<br><br>
+      When things get fast, I slow down. When things get loud, I get quiet.<br><br>
+      This is my voice. This is how I think."
+    </div>
+
+    <div class="record-row">
+      <button class="rec-btn" id="recBtn" onclick="toggleRecord()">
+        <span id="recIcon">⏺</span> <span id="recLabel">Start Recording</span>
+      </button>
+      <span class="rec-timer" id="recTimer"></span>
+    </div>
+    <div class="rec-status" id="recStatus"></div>
+  </div>
+
+  <div class="setup-section">
+    <h3>Voice Preferences</h3>
+    <div class="setup-divider"></div>
+
+    <div class="pref-row">
+      <span class="pref-label">Speech speed</span>
+      <select class="pref-select" id="speechRate" onchange="savePref('rate',this.value)">
+        <option value="0.7">Slow</option>
+        <option value="0.82" selected>Default</option>
+        <option value="0.95">Normal</option>
+      </select>
+    </div>
+
+    <div class="pref-row">
+      <span class="pref-label">Voice tone</span>
+      <select class="pref-select" id="speechPitch" onchange="savePref('pitch',this.value)">
+        <option value="0.8">Deep</option>
+        <option value="0.9" selected>Calm</option>
+        <option value="1.0">Natural</option>
+      </select>
+    </div>
+
+    <div class="pref-row">
+      <span class="pref-label">Start page</span>
+      <select class="pref-select" id="startPage" onchange="savePref('startPage',this.value)">
+        <option value="home" selected>Home</option>
+        <option value="day">My Day</option>
+        <option value="alarm">Alarm</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="setup-section">
+    <h3>About Gnowme</h3>
+    <p>Gnowme is your personal consciousness extension. It doesn't talk <em>to</em> you — it thinks <em>as</em> you. Every script, every guidance moment, every morning wake is written as your internal voice: no instructions, no validation, just clarity.</p>
+    <p style="margin-top:8px">Built on: Mistral AI · LlamaIndex RAG · FastAPI · Python 3.13</p>
+  </div>
+
+</section>
+
+<!-- ══════ TOAST ══════ -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── Constants ────────────────────────────────────────────────────────────────
-const LS = {
-  books:    () => JSON.parse(localStorage.getItem('gn_books') || '{}'),
-  mood:     () => localStorage.getItem('gn_mood') || 'calm',
-  alarm:    () => localStorage.getItem('gn_alarm') || '06:30',
-  alarmOn:  () => localStorage.getItem('gn_alarm_on') === 'true',
-  hasVoice: () => localStorage.getItem('gn_has_voice') === 'true',
-  set: (k,v) => localStorage.setItem(k,v),
-};
-
-const BOOKS = [
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════
+const BOOKS_DATA = [
   {
-    id:'rich_dad_poor_dad', title:'Rich Dad Poor Dad', auth:'Robert Kiyosaki',
-    price:12.99, cat:'Financial Mindset', ico:'💰', bg:'#1a160a',
+    id:'rich_dad',
+    title:'Rich Dad Poor Dad',
+    author:'Robert Kiyosaki',
+    price:12.99,
+    cat:'Financial Mindset',
+    ico:'💰',
+    bg:'#1a140a',
     tagline:'Make money work for you — not the other way around.',
-    what:'This module installs a financial lens into every decision. It trains the mind to see assets vs liabilities and to ask: is this working for me, or am I working for it?',
+    what:'Installs a financial lens into every decision. Trains the mind to see assets vs liabilities and to ask: is this working for me, or am I working for it?',
     how:[
       'Before financial decisions: "Is this working for us, or are we working for it?"',
       'When money stress rises, reframes toward long-term asset thinking',
-      'Reinforces the identity: someone who makes money work, not just earns it',
+      'Reinforces the identity of someone who builds, not just earns',
     ],
-    sample:`…before this choice…\n\nis this working for us… or are we working for it?\n\nthat's the only question that matters here.`,
+    sample:`…before this choice…\n\nis this working for us…\nor are we working for it?\n\nthat's the only question that matters here.`,
     morning:`…waking as someone who makes things work…\nnot someone things happen to…\n\nthat distinction is already the advantage.`,
   },
   {
-    id:'art_of_war', title:'The Art of War', auth:'Sun Tzu',
-    price:9.99, cat:'Strategic Calm', ico:'⚔️', bg:'#0a100a',
+    id:'art_of_war',
+    title:'The Art of War',
+    author:'Sun Tzu',
+    price:9.99,
+    cat:'Strategic Calm',
+    ico:'⚔️',
+    bg:'#0a100a',
     tagline:'Composure under pressure is the sharpest weapon.',
-    what:'Sun Tzu\'s discipline becomes the strategic mind. Choose battles carefully. Enter every high-stakes moment calm. Read situations before reacting. Conserve energy for what matters.',
+    what:"Sun Tzu's discipline becomes the strategic mind. Choose battles carefully. Enter every high-stakes moment calm. Read situations before reacting.",
     how:[
       'In pressure moments: "What is the actual objective here?"',
       'Before negotiations, primes strategic patience over reactive force',
@@ -334,10 +650,15 @@ const BOOKS = [
     morning:`…the strategist sees the board before moving any piece…\n\nwhat does today actually require?\n\nbegin from that.`,
   },
   {
-    id:'atomic_habits', title:'Atomic Habits', auth:'James Clear',
-    price:14.99, cat:'Discipline & Growth', ico:'⚡', bg:'#0a0a1a',
+    id:'atomic_habits',
+    title:'Atomic Habits',
+    author:'James Clear',
+    price:14.99,
+    cat:'Discipline & Growth',
+    ico:'⚡',
+    bg:'#0a0a1a',
     tagline:'Systems beat goals. Identity beats willpower.',
-    what:'Every action is a vote for who you\'re becoming. This module stops willpower-based thinking and installs identity — the daily 1% that compounds into everything.',
+    what:"Every action is a vote for who you're becoming. Stops willpower-based thinking and installs identity — the daily 1% that compounds into everything.",
     how:[
       'When resistance hits: "What would the person becoming do here?"',
       'Celebrates continuity over perfection',
@@ -347,10 +668,15 @@ const BOOKS = [
     morning:`…one small thing done with intention…\nthat's the whole architecture…\n\nwhat's the first one?`,
   },
   {
-    id:'meditations', title:'Meditations', auth:'Marcus Aurelius',
-    price:8.99, cat:'Stoic Resilience', ico:'🏛️', bg:'#100a1a',
+    id:'meditations',
+    title:'Meditations',
+    author:'Marcus Aurelius',
+    price:8.99,
+    cat:'Stoic Resilience',
+    ico:'🏛️',
+    bg:'#100a1a',
     tagline:'The inner citadel is never touched by what happens outside.',
-    what:'Marcus Aurelius wrote to himself every morning. This module installs that same internal discipline — the practice of separating what you control from what you don\'t, and acting with total clarity from there.',
+    what:"Marcus Aurelius wrote to himself every morning. Installs the same internal discipline — separating what you control from what you don't, and acting with total clarity.",
     how:[
       'When external chaos rises: "What here is actually within control?"',
       'Before emotional reactions: "Is this worthy of disturbing the inner state?"',
@@ -360,10 +686,15 @@ const BOOKS = [
     morning:`…the emperor rose not because it was easy…\nbut because there was work…\n\nthat is still the reason.`,
   },
   {
-    id:'power_of_now', title:'The Power of Now', auth:'Eckhart Tolle',
-    price:11.99, cat:'Present Awareness', ico:'🌊', bg:'#0a1010',
+    id:'power_of_now',
+    title:'The Power of Now',
+    author:'Eckhart Tolle',
+    price:11.99,
+    cat:'Present Awareness',
+    ico:'🌊',
+    bg:'#0a1010',
     tagline:'Past and future are thoughts. This moment is real.',
-    what:'Every anxious loop is about what hasn\'t happened yet. This module dissolves that by returning to the only moment that actually exists — this one.',
+    what:"Every anxious loop is about what hasn't happened yet. Dissolves that by returning to the only moment that actually exists — this one.",
     how:[
       'When overthinking spikes: "What is actually happening right now?"',
       'Separates you from thoughts without suppressing them',
@@ -375,434 +706,753 @@ const BOOKS = [
 ];
 
 const MOODS = {
-  calm:    { ico:'🌊', nm:'Calm',    dc:'Soft breath, gentle entry',  freqs:[174,285], scripts:[
-    `…hey…\n\nmorning…\n\ntake a second… let everything come online…\nno rush… just get fully here.\n\nbody feels a little slow… that's fine…\nwe don't need full energy yet… just presence first.\n\none breath in… slow… long exhale…\n\ntoday isn't about doing everything…\njust moving one thing forward cleanly.\n\nsit up… feet on the ground… good.\nnow stand… we're moving.`
-  ]},
-  driven:  { ico:'🔥', nm:'Driven',  dc:'Energised, purposeful',      freqs:[528,741], scripts:[
-    `…rise.\n\ntoday has been waiting.\n\nthe work doesn't pause and neither do you.\nfeel that energy already moving.\n\nthis is your day — direct it.\n\nfirst hour sets everything.\nget up with intention.\none clear move. let's go.`
-  ]},
-  focused: { ico:'🎯', nm:'Focused', dc:'Clear mind, sharp intention', freqs:[396,528], scripts:[
-    `…one thing.\n\nbefore the noise arrives — choose it now.\n\neverything else falls around that single point.\n\nwhat is it?\n\nname it… hold it… guard it.\nthat's the whole day.`
-  ]},
-  stoic:   { ico:'🏛️', nm:'Stoic',   dc:'Grounded, unshakeable',      freqs:[174,285], scripts:[
-    `…Marcus Aurelius rose each morning knowing the day would bring difficulty.\nhe rose anyway.\n\nnot despite it — because of it.\n\nthe day is uncertain. the response doesn't have to be.\n\nrise. be useful. do the work in front of you.\nwaste nothing — especially not the mind.`
-  ]},
-  grateful:{ ico:'✨', nm:'Grateful', dc:'Abundance mindset first',    freqs:[528,639], scripts:[
-    `…before a single thought of what needs doing…\n\npause.\n\nthree things already right.\nthe breath. the mind working. the fact of being here.\n\nthat's the foundation.\nbuild from there.`
-  ]},
-  warrior: { ico:'⚔️', nm:'Warrior', dc:'Strategic, decisive',         freqs:[396,741], scripts:[
-    `…the warrior doesn't wait to feel ready.\n\nthe warrior decides.\n\nSun Tzu knew — the battle is won before it begins, in the mind.\n\nyou've already won this morning by choosing to rise with intention.\n\nwhat is the objective today?\nname it. no vagueness.\nclarity is the weapon. use it now.`
-  ]},
+  calm:    { ico:'🌊', name:'Calm',    desc:'Soft breath, gentle entry',  freqs:[174,285],
+    script:`…hey…\n\nmorning…\n\ntake a second… let everything come online…\nno rush… just get fully here.\n\nbody feels a little slow… that's fine…\nwe don't need full energy yet… just presence first.\n\none breath in… slow… long exhale…\n\ntoday isn't about doing everything…\njust moving one thing forward cleanly.\n\nsit up… feet on the ground… good.\nnow stand… we're moving.` },
+  driven:  { ico:'🔥', name:'Driven',  desc:'Energised, purposeful',      freqs:[528,741],
+    script:`…rise.\n\ntoday has been waiting.\n\nthe work doesn't pause and neither do you.\nfeel that energy already moving.\n\nthis is your day — direct it.\n\nfirst hour sets everything.\nget up with intention.\none clear move. let's go.` },
+  focused: { ico:'🎯', name:'Focused', desc:'Clear mind, sharp intention', freqs:[396,528],
+    script:`…one thing.\n\nbefore the noise arrives — choose it now.\n\neverything else falls around that single point.\n\nwhat is it?\n\nname it… hold it… guard it.\nthat's the whole day.` },
+  stoic:   { ico:'🏛️', name:'Stoic',   desc:'Grounded, unshakeable',      freqs:[174,285],
+    script:`…Marcus Aurelius rose each morning knowing the day would bring difficulty.\nhe rose anyway.\n\nnot despite it — because of it.\n\nthe day is uncertain. the response doesn't have to be.\n\nrise. be useful. do the work in front of you.\nwaste nothing — especially not the mind.` },
+  grateful:{ ico:'✨', name:'Grateful',desc:'Abundance mindset first',     freqs:[528,639],
+    script:`…before a single thought of what needs doing…\n\npause.\n\nthree things already right.\nthe breath. the mind working. the fact of being here.\n\nthat's the foundation.\nbuild from there.` },
+  warrior: { ico:'⚔️', name:'Warrior', desc:'Strategic, decisive',         freqs:[396,741],
+    script:`…the warrior doesn't wait to feel ready.\n\nthe warrior decides.\n\nSun Tzu knew — the battle is won before it begins, in the mind.\n\nyou've already won this morning by choosing to rise with intention.\n\nwhat is the objective today?\nname it. no vagueness.\nclarity is the weapon. use it now.` },
 };
 
 const DAY_SLOTS = [
-  { nm:'Morning Wake',       time:'06:30', desc:'Voice-guided wake-up with music and full activation sequence.',                 btn:'Wake Me Up',   fn:()=>startWakeFlow() },
-  { nm:'Morning Intention',  time:'07:15', desc:'Set the one clear intention before the day\'s noise arrives.',                  btn:'Set Intention', fn:()=>slotSpeak("…before the noise comes in…\n\none thing…\n\nwhat is the single thing that would make today count?\n\nname it now… hold it…\nthat's the north star.") },
-  { nm:'Mid-Morning Reset',  time:'10:00', desc:'A 20-second check-in — is energy still aligned with intention?',               btn:'Check In',     fn:()=>apiFetch('/speak/midday') },
-  { nm:'Midday Anchor',      time:'12:30', desc:'Before eating — pause. A short grounding from active modules.',                 btn:'Ground Me',    fn:()=>apiFetch('/speak/guidance') },
-  { nm:'Decision Moment',    time:'14:00', desc:'Facing a choice? Slow it down before moving.',                                  btn:'Decision Mode', fn:()=>decisionMode() },
-  { nm:'Afternoon Focus',    time:'15:30', desc:'The dip hits here. Energy is lower — smaller steps, still moving.',             btn:'Refocus',      fn:()=>apiFetch('/speak/guidance') },
-  { nm:'Evening Reflection', time:'19:00', desc:'What happened today that deserves recognition? What is tomorrow asking for?',  btn:'Reflect',      fn:()=>apiFetch('/speak/evening') },
-  { nm:'Wind Down',          time:'21:30', desc:'Release the day. Rest is part of the work.',                                    btn:'Wind Down',    fn:()=>apiFetch('/speak/evening') },
+  { name:'Morning Wake',      time:'06:30', desc:'Voice-guided wake-up with ambient music and full activation sequence.',            btn:'Wake Me Up',    fn:()=>startWake() },
+  { name:'Morning Intention', time:'07:15', desc:'Set the one clear intention before the day\'s noise arrives.',                     btn:'Set Intention', fn:()=>intentionMode() },
+  { name:'Mid-Morning Reset', time:'10:00', desc:'20-second check-in — is energy still aligned with intention?',                    btn:'Check In',      fn:()=>fetchAndSpeak('/speak/midday') },
+  { name:'Midday Anchor',     time:'12:30', desc:'Before eating — pause. A short grounding from your active modules.',               btn:'Ground Me',     fn:()=>getGuidance() },
+  { name:'Decision Moment',   time:'14:00', desc:'Facing a choice? Slow it down. Look at it cleanly before moving.',                btn:'Decision Mode', fn:()=>decisionMode() },
+  { name:'Afternoon Focus',   time:'15:30', desc:'The energy dip hits here. Smaller steps, still moving forward.',                  btn:'Refocus',       fn:()=>getGuidance() },
+  { name:'Evening Reflection',time:'19:00', desc:'What happened today that deserves recognition? What is tomorrow asking for?',     btn:'Reflect',       fn:()=>eveningMode() },
+  { name:'Wind Down',         time:'21:30', desc:'Release the day. Rest is part of the work. Nothing left to solve tonight.',       btn:'Wind Down',     fn:()=>eveningMode() },
 ];
 
-// ─── Audio ────────────────────────────────────────────────────────────────────
-let audioCtx, oscs = [];
+const WAKE_STEPS_LOCAL = [
+  { id:'wake_detect', lines:['Hey…','hello…','are we up yet?'], wait:true },
+  { id:'engagement',  lines:['Alright… good…','take a second… let everything come online…','no rush… just get fully here.'], wait:false },
+  { id:'awareness',   lines:['Body feels a little slow…','that\'s fine… we don\'t need full energy yet…','just presence first.'], wait:false },
+  { id:'regulation',  lines:['Take one breath in…','slow…','long exhale…','again… slower on the way out…'], wait:false },
+  { id:'direction',   lines:['Today isn\'t about doing everything…','just moving one thing forward cleanly…','sit up… feet on the ground…'], wait:false },
+  { id:'action_lock', lines:['Good…','now stand…','we\'re moving.'], wait:false },
+];
+
+const FALLBACK_SCRIPTS = {
+  guidance: `…hold for a second…\n\neverything is moving — that's fine…\nlet it move without you having to control all of it…\n\none clear step forward…\nthat's the whole move.\n\nstay centered… then continue.`,
+  decision: `…pause…\n\nthis moment matters…\n\ndon't rush this…\n\nlook at it cleanly…\nwhat actually moves things forward here?\n\n…that's the direction.`,
+  evening:  `…day is closing…\n\nnothing left to solve right now…\n\nlet everything settle…\n\ntomorrow will organize itself…\n\njust release it… slowly…`,
+  intention:`…before the noise comes in…\n\none thing…\n\nwhat is the single thing that would make today count?\n\nname it now… hold it…\nthat's the north star.`,
+  breathe:  `…breathe in… slowly…\none… two… three… four…\n\nhold… gently…\none… two… three… four…\n\nout… all the way…\none… two… three… four… five… six…\n\nagain…\n\nstay here a moment…\nnothing else is required right now.`,
+};
+
+// ═══════════════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════════════
+const S = {
+  get: (k, def='') => { try { return localStorage.getItem('gn_'+k) ?? def; } catch { return def; } },
+  set: (k, v)      => { try { localStorage.setItem('gn_'+k, v); } catch {} },
+  getObj:(k,def={}) => { try { return JSON.parse(localStorage.getItem('gn_'+k) || 'null') ?? def; } catch { return def; } },
+  setObj:(k,v)     => { try { localStorage.setItem('gn_'+k, JSON.stringify(v)); } catch {} },
+};
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let currentState = null;
+let isListening  = false;
+let isSpeaking   = false;
+let recog        = null;
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  const page = document.getElementById(id);
+  if (page) page.classList.add('on');
+  if (btn)  btn.classList.add('on');
+  // Lazy-render
+  if (id === 'books')   renderBooks();
+  if (id === 'day')     renderTimeline();
+  if (id === 'alarm')   renderMoodGrid();
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUDIO  (Web Audio API)
+// ═══════════════════════════════════════════════════════════
+let _actx = null, _nodes = [];
+function getAudioCtx() {
+  if (!_actx || _actx.state === 'closed') _actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_actx.state === 'suspended') _actx.resume();
+  return _actx;
+}
 function startMusic(freqs) {
   stopMusic();
-  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  freqs.forEach(freq => {
-    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = 'lowpass'; filter.frequency.value = 700;
+  const ctx = getAudioCtx();
+  freqs.forEach((freq, i) => {
+    const osc   = ctx.createOscillator();
+    const gain  = ctx.createGain();
+    const filt  = ctx.createBiquadFilter();
+    filt.type = 'lowpass'; filt.frequency.value = 800;
     osc.type = 'sine'; osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.04/freqs.length, audioCtx.currentTime+7);
-    osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); oscs.push({osc,gain});
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.035 / freqs.length, ctx.currentTime + 6);
+    osc.connect(filt); filt.connect(gain); gain.connect(ctx.destination);
+    osc.start();
+    _nodes.push({ osc, gain });
   });
 }
 function stopMusic() {
-  oscs.forEach(({osc,gain})=>{ try{ gain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1.5); setTimeout(()=>osc.stop(),2000); }catch(e){} });
-  oscs=[];
+  const ctx = _actx;
+  _nodes.forEach(({ osc, gain }) => {
+    try {
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.5);
+      setTimeout(() => { try { osc.stop(); } catch {} }, 2000);
+    } catch {}
+  });
+  _nodes = [];
 }
-function stopAll() { stopMusic(); synth.cancel(); setOrbIdle(); }
+function stopAll() {
+  stopMusic();
+  window.speechSynthesis.cancel();
+  if (recog) { try { recog.stop(); } catch {} recog = null; }
+  setOrbIdle();
+  isSpeaking = false; isListening = false;
+}
 
-// ─── Speech ───────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// SPEECH SYNTHESIS
+// ═══════════════════════════════════════════════════════════
 const synth = window.speechSynthesis;
-let recog;
+let _voices = [];
+synth.onvoiceschanged = () => { _voices = synth.getVoices(); };
+setTimeout(() => { _voices = synth.getVoices(); }, 500);
+
+function getBestVoice() {
+  const preferred = ['Samantha','Daniel','Karen','Moira','Alex','Victoria'];
+  for (const name of preferred) {
+    const v = _voices.find(x => x.name.includes(name));
+    if (v) return v;
+  }
+  return _voices.find(v => v.lang.startsWith('en')) || null;
+}
 
 function speak(text, onEnd) {
   synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.78; u.pitch = 0.9; u.volume = 1;
-  const v = synth.getVoices();
-  const pref = v.find(x=>x.name.includes('Samantha')||x.name.includes('Daniel')||x.name.includes('Karen')||x.name.includes('Moira'));
-  if(pref) u.voice = pref;
-  u.onend = () => { setOrbIdle(); if(onEnd) onEnd(); };
+  const utt = new SpeechSynthesisUtterance(text.replace(/…/g, '... ').replace(/\n/g, ' '));
+  utt.rate   = parseFloat(S.get('rate', '0.82'));
+  utt.pitch  = parseFloat(S.get('pitch', '0.9'));
+  utt.volume = 1;
+  const v = getBestVoice();
+  if (v) utt.voice = v;
+  utt.onend = () => {
+    isSpeaking = false;
+    setOrbIdle();
+    if (onEnd) onEnd();
+  };
+  utt.onerror = () => {
+    isSpeaking = false;
+    setOrbIdle();
+    if (onEnd) onEnd();
+  };
   setOrbState('speaking');
-  synth.speak(u);
+  isSpeaking = true;
+  synth.speak(utt);
 }
 
-function toggleListen() {
-  if(synth.speaking){ stopAll(); return; }
-  if(recog){ stopListen(); return; }
-  startListen();
+function setDisplay(text, live = false) {
+  const box = document.getElementById('speechBox');
+  box.textContent = text;
+  box.classList.toggle('live', live);
 }
-function startListen() {
-  if(!('SpeechRecognition' in window||'webkitSpeechRecognition' in window)){ toast('Voice input requires Chrome or Safari'); return; }
-  recog = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
-  recog.lang='en-US'; recog.interimResults=false;
-  recog.onresult = e => { stopListen(); handleVoiceInput(e.results[0][0].transcript); };
-  recog.onerror = ()=>{ stopListen(); toast('Didn\'t catch that — try again'); };
-  recog.onend = ()=>{ if(recog){ recog=null; setOrbIdle(); } };
+
+function displayAndSpeak(text) {
+  goPage('home', document.querySelector('.tab[data-page="home"]'));
+  setDisplay(text, true);
+  speak(text);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ORB STATE
+// ═══════════════════════════════════════════════════════════
+function setOrbState(state) {
+  const orb  = document.getElementById('orb');
+  const hint = document.getElementById('orbHint');
+  orb.classList.remove('listening','speaking');
+  if (state === 'listening') {
+    orb.classList.add('listening'); orb.textContent = '👂';
+    hint.textContent = 'Listening…'; hint.classList.add('active');
+  } else if (state === 'speaking') {
+    orb.classList.add('speaking'); orb.textContent = '💬';
+    hint.textContent = 'Speaking…'; hint.classList.add('active');
+  } else {
+    setOrbIdle();
+  }
+}
+function setOrbIdle() {
+  const orb  = document.getElementById('orb');
+  const hint = document.getElementById('orbHint');
+  orb.classList.remove('listening','speaking');
+  orb.textContent = '🎙';
+  hint.textContent = 'Tap to speak';
+  hint.classList.remove('active');
+  isListening = false;
+}
+
+// ═══════════════════════════════════════════════════════════
+// VOICE RECOGNITION
+// ═══════════════════════════════════════════════════════════
+function orbTap() {
+  if (isSpeaking) { stopAll(); return; }
+  if (isListening) { stopListening(); return; }
+  startListening();
+}
+function startListening() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) {
+    toast('Voice input requires Chrome or Edge — or type below');
+    return;
+  }
+  recog = new SpeechRec();
+  recog.lang = 'en-US'; recog.interimResults = false; recog.maxAlternatives = 1;
+  recog.onresult = e => {
+    const transcript = e.results[0][0].transcript;
+    stopListening();
+    handleVoiceInput(transcript);
+  };
+  recog.onerror = () => { stopListening(); toast('Didn\'t catch that — try again'); };
+  recog.onend   = () => { if (isListening) setOrbIdle(); };
   recog.start();
+  isListening = true;
   setOrbState('listening');
 }
-function stopListen() { try{ recog&&recog.stop(); }catch(e){} recog=null; setOrbIdle(); }
-
+function stopListening() {
+  try { recog && recog.stop(); } catch {}
+  recog = null;
+  isListening = false;
+  setOrbIdle();
+}
 async function handleVoiceInput(text) {
-  setDisplay(`You said: "${text}"`);
-  const data = await apiFetch('/speak/guidance', { user_input: text });
-  if(data) displayAndSpeak(data.monologue);
+  setDisplay(`You: "${text}"\n\n…`, true);
+  try {
+    const res = await apiPost('/speak/guidance', { user_input: text });
+    if (res && res.monologue) displayAndSpeak(res.monologue);
+    else displayAndSpeak(FALLBACK_SCRIPTS.guidance);
+  } catch {
+    displayAndSpeak(FALLBACK_SCRIPTS.guidance);
+  }
 }
 
-function setOrbState(s) {
-  const orb=document.getElementById('orb'), hint=document.getElementById('vhint');
-  orb.classList.remove('listening','speaking');
-  if(s==='listening'){ orb.classList.add('listening'); orb.textContent='👂'; hint.textContent='Listening…'; hint.classList.add('active'); }
-  else if(s==='speaking'){ orb.classList.add('speaking'); orb.textContent='💬'; hint.textContent='Speaking…'; hint.classList.add('active'); }
-  else setOrbIdle();
-}
-function setOrbIdle(){ const o=document.getElementById('orb'),h=document.getElementById('vhint'); o.classList.remove('listening','speaking'); o.textContent='🎙'; h.textContent='Tap the orb to speak'; h.classList.remove('active'); }
-
-function setDisplay(text, live=false) {
-  const d=document.getElementById('speechDisplay');
-  d.textContent=text; d.classList.toggle('live',live);
-}
-function displayAndSpeak(text) { setDisplay(text,true); speak(text); }
-
-async function requestGuidance() {
+// ═══════════════════════════════════════════════════════════
+// GUIDANCE MODES
+// ═══════════════════════════════════════════════════════════
+async function getGuidance() {
   setDisplay('…drawing from consciousness modules…');
-  const data = await apiFetch('/speak/guidance');
-  if(data) displayAndSpeak(data.monologue);
+  const res = await apiPost('/speak/guidance');
+  displayAndSpeak(res?.monologue || FALLBACK_SCRIPTS.guidance);
 }
 async function decisionMode() {
-  setDisplay('…decision moment…');
-  const data = await apiFetch('/speak/decision');
-  if(data) displayAndSpeak(data.monologue);
+  setDisplay('…decision moment…\n\npause. look at it cleanly.');
+  const res = await apiPost('/speak/decision');
+  displayAndSpeak(res?.monologue || FALLBACK_SCRIPTS.decision);
+}
+async function eveningMode() {
+  setDisplay('…day is closing…');
+  const res = await apiPost('/speak/evening');
+  displayAndSpeak(res?.monologue || FALLBACK_SCRIPTS.evening);
+}
+function intentionMode() {
+  displayAndSpeak(FALLBACK_SCRIPTS.intention);
+}
+function breatheMode() {
+  setDisplay(FALLBACK_SCRIPTS.breathe, true);
+  speak(FALLBACK_SCRIPTS.breathe);
+}
+async function fetchAndSpeak(path) {
+  const res = await apiPost(path);
+  displayAndSpeak(res?.monologue || FALLBACK_SCRIPTS.guidance);
 }
 
-// ─── Wake Flow ────────────────────────────────────────────────────────────────
-let wakeStep = 0;
-async function startWakeFlow() {
-  const mood = LS.mood();
-  startMusic(MOODS[mood].freqs);
-  wakeStep = 0;
-  document.getElementById('wakeModal').classList.add('on');
+// ═══════════════════════════════════════════════════════════
+// STATE ENGINE
+// ═══════════════════════════════════════════════════════════
+async function checkState() {
+  const pills = document.getElementById('statePills');
+  pills.innerHTML = '<span class="pill">Reading state…</span>';
+  try {
+    const res = await apiPost('/speak/guidance');
+    if (res && res.state) {
+      currentState = res.state;
+      renderStatePills(res.state);
+    } else {
+      renderStatePills(null);
+    }
+  } catch {
+    renderStatePills(null);
+  }
+}
+function renderStatePills(state) {
+  const pills = document.getElementById('statePills');
+  if (!state || !state.energy) {
+    pills.innerHTML = '<span class="pill">State unavailable — tap "Read State" to check</span>';
+    return;
+  }
+  const defs = [
+    { label:`Energy · ${state.energy}`,    cls: state.energy==='high'?'hi':state.energy==='low'?'lo':'mid' },
+    { label:`Stress · ${state.stress}`,    cls: state.stress==='high'?'lo':state.stress==='low'?'hi':'mid' },
+    { label:`Focus · ${state.focus}`,      cls: state.focus==='deep'?'hi':state.focus==='scattered'?'lo':'mid' },
+    { label:`Ready · ${state.readiness}`,  cls: state.readiness==='peak'?'hi':state.readiness==='low'?'lo':'mid' },
+  ];
+  pills.innerHTML = defs.map(d => `<span class="pill ${d.cls}">${d.label}</span>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// ACTIVE MODULES
+// ═══════════════════════════════════════════════════════════
+function renderActiveMods() {
+  const el = document.getElementById('activeMods');
+  const books = S.getObj('activeBooks');
+  const ids = Object.keys(books);
+  if (ids.length === 0) {
+    el.innerHTML = '<span class="no-modules">No consciousness modules active — add books to begin</span>';
+    return;
+  }
+  el.innerHTML = ids.map(id => {
+    const b = BOOKS_DATA.find(x => x.id === id);
+    return b ? `<span class="mod-chip">${b.ico} ${b.title.split(' ').slice(0,3).join(' ')}</span>` : '';
+  }).join('');
+}
+function updateBooksBadge() {
+  const n = Object.keys(S.getObj('activeBooks')).length;
+  const badge = document.getElementById('booksBadge');
+  if (badge) badge.textContent = n;
+  const stat = document.getElementById('bstatActive');
+  if (stat) stat.textContent = `${n} active`;
+  stat && (n > 0 ? stat.classList.add('lit') : stat.classList.remove('lit'));
+}
+
+// ═══════════════════════════════════════════════════════════
+// GREETING
+// ═══════════════════════════════════════════════════════════
+function setGreeting() {
+  const h = new Date().getHours();
+  const greets = h < 5 ? 'Still up?' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 21 ? 'Good evening' : 'Winding down';
+  document.getElementById('greeting').innerHTML = `<strong>${greets}.</strong> Gnowme is ready.`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// WAKE FLOW
+// ═══════════════════════════════════════════════════════════
+let _wakeStep = 0;
+async function startWake() {
+  const mood = S.get('mood','calm');
+  if (MOODS[mood]) startMusic(MOODS[mood].freqs);
+  _wakeStep = 0;
+  document.getElementById('wakeOverlay').classList.add('on');
+  renderWakeProgress();
   await runWakeStep();
 }
+function renderWakeProgress() {
+  const el = document.getElementById('wakeProgress');
+  el.innerHTML = WAKE_STEPS_LOCAL.map((_, i) =>
+    `<div class="wp-dot ${i < _wakeStep ? 'done' : i === _wakeStep ? 'now' : ''}"></div>`
+  ).join('');
+}
 async function runWakeStep() {
-  const modal = document.getElementById('wakeModal');
   const textEl = document.getElementById('wakeText');
   const btn    = document.getElementById('wakeBtn');
+  renderWakeProgress();
 
-  const step = await fetchWakeStep(wakeStep);
-  if(step.done){ closeWake(); return; }
-
-  textEl.textContent = '';
-  btn.style.display = 'none';
-
-  // Reveal lines one at a time with pauses
-  for(const line of step.lines) {
-    await new Promise(res => {
-      textEl.textContent += (textEl.textContent ? '\n' : '') + line;
-      speak(line.replace(/…/g,'... '), res);
+  let step;
+  try {
+    const res = await fetch('/morning/wake/step', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:'koya', step: _wakeStep })
     });
-    await delay(800);
+    step = await res.json();
+    if (step.done) { closeWake(); return; }
+    step.wait = step.wait_for_response;
+  } catch {
+    if (_wakeStep >= WAKE_STEPS_LOCAL.length) { closeWake(); return; }
+    step = WAKE_STEPS_LOCAL[_wakeStep];
   }
 
-  if(step.wait_for_response) {
+  textEl.style.opacity = '0';
+  await pause(300);
+  textEl.textContent = '';
+  textEl.style.opacity = '1';
+  btn.style.display = 'none';
+
+  for (let i = 0; i < step.lines.length; i++) {
+    const line = step.lines[i];
+    if (i > 0) textEl.textContent += '\n';
+    textEl.textContent += line;
+    await new Promise(res => speak(line, res));
+    await pause(600);
+  }
+
+  if (step.wait) {
     btn.style.display = 'block';
   } else {
-    await delay(1200);
-    wakeStep++;
+    await pause(1000);
+    _wakeStep++;
+    if (_wakeStep >= WAKE_STEPS_LOCAL.length) { closeWake(); return; }
     await runWakeStep();
   }
 }
 async function wakeNext() {
   document.getElementById('wakeBtn').style.display = 'none';
-  wakeStep++;
+  _wakeStep++;
+  if (_wakeStep >= WAKE_STEPS_LOCAL.length) { closeWake(); return; }
   await runWakeStep();
 }
 function closeWake() {
-  document.getElementById('wakeModal').classList.remove('on');
+  document.getElementById('wakeOverlay').classList.remove('on');
   stopAll();
-  wakeStep = 0;
-}
-async function fetchWakeStep(n) {
-  try {
-    const r = await fetch('/morning/wake/step', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id:'koya',step:n}) });
-    return await r.json();
-  } catch {
-    // fallback hardcoded steps
-    const steps = [
-      { id:'wake_detect', lines:['Hey…','hello…','are we up yet?'], wait_for_response:true, done:false },
-      { id:'engagement',  lines:['Alright… good…','take a second… let everything come online…','no rush… just get fully here.'], wait_for_response:false, done:false },
-      { id:'awareness',   lines:['Body feels a little slow…','that\'s fine… we don\'t need full energy yet…','just presence first.'], wait_for_response:false, done:false },
-      { id:'regulation',  lines:['Take one breath in…','slow…','long exhale…','again… slower on the way out…'], wait_for_response:false, done:false },
-      { id:'direction',   lines:['Today isn\'t about doing everything…','just moving one thing forward cleanly…','start simple… sit up…','feet on the ground…'], wait_for_response:false, done:false },
-      { id:'action_lock', lines:['Good…','now stand…','we\'re moving.'], wait_for_response:false, done:false },
-    ];
-    return n < steps.length ? steps[n] : { id:'done', lines:[], wait_for_response:false, done:true };
-  }
+  _wakeStep = 0;
 }
 
-// ─── Alarm ────────────────────────────────────────────────────────────────────
-function setAlarmTime(v) {
-  LS.set('gn_alarm',v);
-  document.getElementById('alarmClock').textContent = v;
-  if(LS.alarmOn()) updateAlarmMsg();
-}
-function toggleAlarm() {
-  LS.set('gn_alarm_on', document.getElementById('alarmOn').checked);
-  updateAlarmMsg();
-}
-function updateAlarmMsg() {
-  const el = document.getElementById('alarmMsg');
-  if(LS.alarmOn()){ el.textContent=`⏰ Alarm set for ${LS.alarm()} — ${LS.mood()} mood`; el.classList.add('on'); }
-  else el.classList.remove('on');
-}
-function selectMood(el, id) {
-  document.querySelectorAll('.mood').forEach(m=>m.classList.remove('on'));
-  el.classList.add('on');
-  LS.set('gn_mood',id);
-  if(LS.alarmOn()) updateAlarmMsg();
-}
-function previewAlarm() {
-  const mood = LS.mood();
-  const script = MOODS[mood].scripts[0];
-  const pa = document.getElementById('previewArea');
-  pa.textContent = script; pa.classList.add('loaded');
-  startMusic(MOODS[mood].freqs);
-  setTimeout(()=>speak(script.replace(/\n/g,' '), ()=>setTimeout(stopMusic,2000)), 3000);
-}
-setInterval(()=>{
-  if(!LS.alarmOn()) return;
-  const now = new Date(), [h,m] = LS.alarm().split(':').map(Number);
-  if(now.getHours()===h && now.getMinutes()===m && now.getSeconds()<30) startWakeFlow();
-},30000);
-
-// ─── Books ────────────────────────────────────────────────────────────────────
-function renderBooks(filter='') {
-  const grid = document.getElementById('bookGrid');
-  const active = LS.books();
-  const list = BOOKS.filter(b=> !filter || [b.title,b.cat,b.tagline,b.what].some(s=>s.toLowerCase().includes(filter.toLowerCase())));
-  grid.innerHTML = list.map(b => `
-    <div class="book ${active[b.id]?'active-book':''}" id="book-${b.id}">
-      <div class="book-hd" onclick="toggleBook('${b.id}')">
-        <div class="cover" style="background:${b.bg}">${b.ico}</div>
-        <div class="book-info">
-          <div class="book-title">${b.title}</div>
-          <div class="book-auth">${b.auth}</div>
-          <span class="book-tag">${b.cat}</span>
-          <div class="book-tagline">${b.tagline}</div>
-        </div>
-        <div class="book-right">
-          <span class="price">$${b.price.toFixed(2)}</span>
-          ${active[b.id]?'<span class="active-badge">● ACTIVE</span>':''}
-          <span class="chevron" id="chev-${b.id}">▾</span>
-        </div>
-      </div>
-      <div class="book-body" id="body-${b.id}">
-        <div class="dsec"><h4>What this consciousness does</h4><p>${b.what}</p></div>
-        <div class="dsec"><h4>How it integrates into you</h4><ul>${b.how.map(h=>`<li>${h}</li>`).join('')}</ul></div>
-        <div class="dsec"><h4>What you'll actually hear</h4><div class="sample">${b.sample}</div></div>
-        <div class="dsec"><h4>How it wakes you up</h4><div class="sample">${b.morning}</div></div>
-        <div class="book-actions">
-          <select class="priority-sel" id="pri-${b.id}">
-            <option value="primary">Primary consciousness</option>
-            <option value="background">Background influence</option>
-          </select>
-          <button class="hear-btn" onclick="hearSample('${b.id}')">▶ Hear Sample</button>
-          <button class="add-btn ${active[b.id]?'done':''}" id="addbtn-${b.id}"
-            onclick="${active[b.id]?'':``addBook('${b.id}')``}"
-            ${active[b.id]?'disabled':''}>
-            ${active[b.id]?'✓ Active':'Add to Consciousness'}
-          </button>
-        </div>
-      </div>
+// ═══════════════════════════════════════════════════════════
+// ALARM
+// ═══════════════════════════════════════════════════════════
+function renderMoodGrid() {
+  const grid = document.getElementById('moodGrid');
+  if (!grid || grid.children.length > 0) return;
+  const current = S.get('mood','calm');
+  grid.innerHTML = Object.entries(MOODS).map(([id, m]) => `
+    <div class="mood-card ${current === id ? 'on' : ''}" onclick="selectMood('${id}', this)">
+      <span class="mood-ico">${m.ico}</span>
+      <span class="mood-name">${m.name}</span>
+      <span class="mood-desc">${m.desc}</span>
     </div>
   `).join('');
 }
-function toggleBook(id) {
-  const body=document.getElementById(`body-${id}`), chev=document.getElementById(`chev-${id}`);
-  const isOpen = body.classList.contains('open');
-  document.querySelectorAll('.book-body').forEach(b=>b.classList.remove('open'));
-  document.querySelectorAll('.chevron').forEach(c=>c.textContent='▾');
-  if(!isOpen){ body.classList.add('open'); chev.textContent='▴'; }
+function selectMood(id, el) {
+  document.querySelectorAll('.mood-card').forEach(m => m.classList.remove('on'));
+  el.classList.add('on');
+  S.set('mood', id);
+  updateAlarmLabel();
+  // Update preview
+  const pb = document.getElementById('previewBox');
+  if (pb && pb.classList.contains('loaded')) {
+    pb.textContent = MOODS[id].script;
+  }
+}
+function onAlarmTimeChange(val) {
+  S.set('alarmTime', val);
+  updateAlarmLabel();
+}
+function onAlarmToggle() {
+  const checked = document.getElementById('alarmToggle').checked;
+  S.set('alarmOn', checked ? 'true' : 'false');
+  updateAlarmLabel();
+  toast(checked ? `Alarm set for ${S.get('alarmTime','06:30')}` : 'Alarm off');
+}
+function updateAlarmLabel() {
+  const on   = S.get('alarmOn','false') === 'true';
+  const time = S.get('alarmTime','06:30');
+  const mood = S.get('mood','calm');
+  const lbl  = document.getElementById('alarmSetLabel');
+  const msg  = document.getElementById('alarmActiveMsg');
+  if (lbl) lbl.innerHTML = on ? `Alarm: <strong>${time}</strong> — ${MOODS[mood]?.name || mood}` : 'Alarm: <strong>off</strong>';
+  if (msg) { msg.textContent = on ? `⏰ Alarm set for ${time} · ${MOODS[mood]?.name || mood} mood` : ''; msg.classList.toggle('on', on); }
+}
+function previewMorning() {
+  const mood = S.get('mood','calm');
+  const m    = MOODS[mood];
+  const pb   = document.getElementById('previewBox');
+  pb.textContent = m.script; pb.classList.add('loaded');
+  stopAll();
+  startMusic(m.freqs);
+  setTimeout(() => speak(m.script, () => setTimeout(stopMusic, 2000)), 2500);
+}
+// Live clock
+function tickClock() {
+  const now    = new Date();
+  const h      = now.getHours();
+  const m      = String(now.getMinutes()).padStart(2,'0');
+  const ampm   = h >= 12 ? 'PM' : 'AM';
+  const h12    = h % 12 || 12;
+  const cl     = document.getElementById('liveClock');
+  const amEl   = document.getElementById('liveAmPm');
+  if (cl) cl.childNodes[0].textContent = `${h12}:${m}`;
+  if (amEl) amEl.textContent = ampm;
+
+  // Alarm check
+  if (S.get('alarmOn','false') === 'true') {
+    const [ah, am2] = (S.get('alarmTime','06:30')).split(':').map(Number);
+    if (h === ah && now.getMinutes() === am2 && now.getSeconds() < 30) {
+      if (!document.getElementById('wakeOverlay').classList.contains('on')) startWake();
+    }
+  }
+}
+setInterval(tickClock, 1000);
+tickClock();
+
+// ═══════════════════════════════════════════════════════════
+// BOOKS
+// ═══════════════════════════════════════════════════════════
+function renderBooks(filter = '') {
+  const list    = document.getElementById('bookList');
+  const active  = S.getObj('activeBooks');
+  const query   = filter.toLowerCase();
+  const visible = BOOKS_DATA.filter(b => !query || [b.title, b.author, b.cat, b.tagline, b.what].some(s => s.toLowerCase().includes(query)));
+
+  list.innerHTML = visible.map(b => {
+    const isActive = !!active[b.id];
+    return `
+    <div class="book-card ${isActive ? 'active' : ''}" id="bcard-${b.id}">
+      <div class="book-header" onclick="toggleBookExpand('${b.id}')">
+        <div class="book-cover" style="background:${b.bg}">${b.ico}</div>
+        <div class="book-meta">
+          <div class="book-title">${b.title}</div>
+          <div class="book-author">${b.author}</div>
+          <span class="book-cat">${b.cat}</span>
+          <div class="book-tagline">${b.tagline}</div>
+        </div>
+        <div class="book-right">
+          <span class="book-price">$${b.price.toFixed(2)}</span>
+          ${isActive ? '<span class="book-active-badge">● ACTIVE</span>' : ''}
+          <span class="book-chevron" id="bchev-${b.id}">▾</span>
+        </div>
+      </div>
+      <div class="book-body" id="bbody-${b.id}">
+        <div class="detail-section">
+          <h4>What this consciousness does</h4>
+          <p>${b.what}</p>
+        </div>
+        <div class="detail-section">
+          <h4>How it integrates into you</h4>
+          <ul>${b.how.map(h => `<li>${h}</li>`).join('')}</ul>
+        </div>
+        <div class="detail-section">
+          <h4>What you'll actually hear</h4>
+          <div class="sample-quote">${b.sample}</div>
+        </div>
+        <div class="detail-section">
+          <h4>How it wakes you up</h4>
+          <div class="sample-quote">${b.morning}</div>
+        </div>
+        <div class="book-actions-row">
+          <select class="priority-select" id="bpri-${b.id}">
+            <option value="primary">Primary consciousness</option>
+            <option value="background">Background influence</option>
+          </select>
+          <button class="hear-sample-btn" onclick="hearSample('${b.id}')">▶ Hear Sample</button>
+          ${isActive
+            ? `<button class="add-book-btn added" disabled>✓ Active</button>`
+            : `<button class="add-book-btn" onclick="addBook('${b.id}')">Add to Consciousness</button>`
+          }
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleBookExpand(id) {
+  const body = document.getElementById(`bbody-${id}`);
+  const chev = document.getElementById(`bchev-${id}`);
+  const wasOpen = body.classList.contains('open');
+  document.querySelectorAll('.book-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.book-chevron').forEach(c => c.textContent = '▾');
+  if (!wasOpen) { body.classList.add('open'); chev.textContent = '▴'; }
 }
 async function addBook(id) {
-  const b = BOOKS.find(x=>x.id===id);
-  const pri = document.getElementById(`pri-${id}`)?.value||'primary';
-  try { await fetch('/books/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'koya',book_id:id,priority:pri})}); } catch(e){}
-  const active = LS.books(); active[id]=pri; LS.set('gn_books',JSON.stringify(active));
-  renderBooks(); renderActiveMods();
+  const b   = BOOKS_DATA.find(x => x.id === id);
+  const pri = document.getElementById(`bpri-${id}`)?.value || 'primary';
+  // API call (non-blocking)
+  apiPost('/books/add', { user_id:'koya', book_id: id, priority: pri }).catch(() => {});
+  const active = S.getObj('activeBooks');
+  active[id] = pri;
+  S.setObj('activeBooks', active);
+  renderBooks(document.getElementById('bookSearch')?.value || '');
+  renderActiveMods();
+  updateBooksBadge();
   toast(`"${b.title}" added as ${pri} consciousness`);
 }
 function hearSample(id) {
-  const b = BOOKS.find(x=>x.id===id);
-  if(b) speak(b.sample.replace(/…/g,'... ').replace(/\n/g,' '));
+  const b = BOOKS_DATA.find(x => x.id === id);
+  if (b) speak(b.sample);
 }
-function filterBooks(v) { renderBooks(v); }
+function filterBooks(q) { renderBooks(q); }
 
-// ─── Active Modules ───────────────────────────────────────────────────────────
-function renderActiveMods() {
-  const el = document.getElementById('activeMods');
-  const active = LS.books();
-  el.innerHTML = Object.keys(active).map(id=>{
-    const b=BOOKS.find(x=>x.id===id);
-    return b?`<span class="mod-pill">${b.ico} ${b.title.split(' ').slice(0,2).join(' ')}</span>`:'';
-  }).join('');
-}
-
-// ─── State Display ────────────────────────────────────────────────────────────
-function renderState(state) {
-  const row = document.getElementById('stateRow');
-  if(!state||!state.energy){ row.innerHTML=''; return; }
-  const pills = [
-    {label:`Energy: ${state.energy}`, cls: state.energy==='high'?'hi':state.energy==='low'?'lo':''},
-    {label:`Stress: ${state.stress}`, cls: state.stress==='high'?'lo':state.stress==='low'?'hi':''},
-    {label:`Focus: ${state.focus}`,   cls: state.focus==='deep'?'hi':state.focus==='scattered'?'lo':''},
-    {label:`Ready: ${state.readiness}`,cls: state.readiness==='peak'?'hi':state.readiness==='low'?'lo':''},
-  ];
-  row.innerHTML = pills.map(p=>`<span class="state-pill ${p.cls}">${p.label}</span>`).join('');
-}
-
-// ─── Day ──────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// TIMELINE
+// ═══════════════════════════════════════════════════════════
 function renderTimeline() {
+  const tl  = document.getElementById('timeline');
   const now = new Date();
-  const tl = document.getElementById('timeline');
-  tl.innerHTML = DAY_SLOTS.map((s,i)=>{
-    const [h,m]=s.time.split(':').map(Number);
-    const t=new Date(); t.setHours(h,m,0);
-    const past=now>t, curr=Math.abs(now-t)<45*60000;
+  tl.innerHTML = DAY_SLOTS.map((s, i) => {
+    const [h,m] = s.time.split(':').map(Number);
+    const slotTime = new Date(); slotTime.setHours(h, m, 0, 0);
+    const isPast = now > slotTime && (now - slotTime) > 45 * 60000;
+    const isNow  = Math.abs(now - slotTime) <= 45 * 60000;
     return `
-      <div class="slot">
-        <div class="sl"></div>
-        <div class="sl-left"><div class="dot ${curr?'now':past?'past':''}"></div><span class="sl-time">${s.time}</span></div>
-        <div class="slot-card">
-          <div class="slot-name">${s.nm}</div>
-          <div class="slot-desc">${s.desc}</div>
-          <button class="slot-btn" onclick="daySlot(${i})">${s.btn}</button>
-        </div>
-      </div>`;
+    <div class="tl-slot">
+      <div class="tl-left">
+        <div class="tl-dot ${isNow ? 'now' : isPast ? 'past' : ''}"></div>
+        <span class="tl-time">${s.time}</span>
+      </div>
+      <div class="tl-card ${isNow ? 'now-card' : isPast ? 'past-card' : ''}">
+        <div class="tl-slot-name">${s.name}${isNow ? '<span class="now-tag">NOW</span>' : ''}</div>
+        <div class="tl-slot-desc">${s.desc}</div>
+        <button class="tl-slot-btn" onclick="triggerSlot(${i})">${s.btn}</button>
+      </div>
+    </div>`;
   }).join('');
+
+  // Date label
+  const dl = document.getElementById('dayDate');
+  if (dl) dl.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+}
+function triggerSlot(i) {
+  goPage('home', document.querySelector('.tab[data-page="home"]'));
+  setTimeout(() => DAY_SLOTS[i].fn(), 200);
 }
 
-async function daySlot(i) {
-  const slot = DAY_SLOTS[i];
-  go('home', document.querySelector('.tabs .tab'));
-  await delay(300);
-  slot.fn();
-}
-
-async function slotSpeak(text) { setDisplay(text,true); speak(text.replace(/…/g,'... ').replace(/\n/g,' ')); }
-
-// ─── API ──────────────────────────────────────────────────────────────────────
-async function apiFetch(path, extra={}) {
-  try {
-    const r = await fetch(path, { method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({user_id:'koya',bio_state:{},context:{agent_context:true},...extra}) });
-    return await r.json();
-  } catch {
-    return { monologue:'…steady…\n\none step at a time.\n\nthat\'s enough.' };
-  }
-}
-
-// ─── Voice Recording ──────────────────────────────────────────────────────────
-let mediaRec, chunks=[], recInterval;
+// ═══════════════════════════════════════════════════════════
+// VOICE RECORDING
+// ═══════════════════════════════════════════════════════════
+let _mediaRec = null, _recChunks = [], _recInterval = null;
 async function toggleRecord() {
-  if(mediaRec && mediaRec.state==='recording'){ stopRecord(); return; }
+  if (_mediaRec && _mediaRec.state === 'recording') { stopRecording(); return; }
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-    mediaRec = new MediaRecorder(stream); chunks=[];
-    mediaRec.ondataavailable = e => chunks.push(e.data);
-    mediaRec.onstop = () => uploadVoice(new Blob(chunks,{type:'audio/wav'}));
-    mediaRec.start();
-    let secs=0;
-    recInterval = setInterval(()=>{ secs++; document.getElementById('recTimer').textContent=`${secs}s`; },1000);
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    _mediaRec = new MediaRecorder(stream); _recChunks = [];
+    _mediaRec.ondataavailable = e => _recChunks.push(e.data);
+    _mediaRec.onstop = () => uploadVoice(new Blob(_recChunks, { type:'audio/wav' }));
+    _mediaRec.start();
+    let secs = 0;
+    _recInterval = setInterval(() => {
+      secs++;
+      document.getElementById('recTimer').textContent = `${secs}s`;
+      if (secs >= 60) stopRecording();
+    }, 1000);
     document.getElementById('recBtn').classList.add('recording');
-    document.getElementById('recLabel').textContent='Stop Recording';
-    document.getElementById('recIcon').textContent='⏹';
+    document.getElementById('recLabel').textContent = 'Stop Recording';
+    document.getElementById('recIcon').textContent = '⏹';
+    document.getElementById('recStatus').textContent = '';
   } catch { toast('Microphone access required'); }
 }
-function stopRecord() {
-  mediaRec&&mediaRec.stop();
-  clearInterval(recInterval);
+function stopRecording() {
+  try { _mediaRec && _mediaRec.stop(); } catch {}
+  clearInterval(_recInterval);
   document.getElementById('recBtn').classList.remove('recording');
-  document.getElementById('recLabel').textContent='Start Recording';
-  document.getElementById('recIcon').textContent='⏺';
-  document.getElementById('recStatus').textContent='Processing voice…';
+  document.getElementById('recLabel').textContent = 'Start Recording';
+  document.getElementById('recIcon').textContent = '⏺';
+  document.getElementById('recTimer').textContent = '';
+  document.getElementById('recStatus').textContent = 'Uploading voice…';
 }
 async function uploadVoice(blob) {
   try {
-    const fd = new FormData(); fd.append('file',blob,'voice.wav');
-    const r = await fetch('/voice/clone?user_id=koya',{method:'POST',body:fd});
-    const d = await r.json();
-    if(d.status==='success'){
-      LS.set('gn_has_voice','true');
-      document.getElementById('recStatus').textContent='Voice cloned. Gnowme now sounds like you.';
-      setTimeout(()=>{ go('home',document.querySelector('.tabs .tab')); },2000);
-    }
+    const fd = new FormData(); fd.append('file', blob, 'voice.wav');
+    const res = await fetch('/voice/clone?user_id=koya', { method:'POST', body: fd });
+    const d = await res.json();
+    if (d.status === 'success' || d.status === 'queued') {
+      S.set('hasVoice','true');
+      setVoiceStatus(true);
+      document.getElementById('recStatus').textContent = '✓ Voice recorded. Gnowme now sounds like you.';
+      toast('Voice clone saved');
+    } else throw new Error('Upload failed');
   } catch {
-    document.getElementById('recStatus').textContent='Saved locally. Voice cloning active.';
-    LS.set('gn_has_voice','true');
-    setTimeout(()=>{ go('home',document.querySelector('.tabs .tab')); },2000);
+    // Save locally
+    S.set('hasVoice','true');
+    setVoiceStatus(true);
+    document.getElementById('recStatus').textContent = '✓ Voice recorded locally.';
+    toast('Voice saved');
   }
 }
-function skipSetup() { LS.set('gn_has_voice','false'); go('home',document.querySelector('.tabs .tab')); }
-
-// ─── Nav ──────────────────────────────────────────────────────────────────────
-function go(id, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-  btn.classList.add('on');
+function setVoiceStatus(active) {
+  const dot = document.getElementById('voiceStatusDot');
+  const txt = document.getElementById('voiceStatusTxt');
+  if (active) {
+    dot.classList.add('active');
+    txt.textContent = 'Voice recorded — Gnowme uses your voice';
+  } else {
+    dot.classList.remove('active');
+    txt.textContent = 'No voice recorded — using system voice';
+  }
 }
 
+// ═══════════════════════════════════════════════════════════
+// PREFERENCES
+// ═══════════════════════════════════════════════════════════
+function savePref(key, val) {
+  S.set(key, val);
+  toast('Saved');
+}
+
+// ═══════════════════════════════════════════════════════════
+// API
+// ═══════════════════════════════════════════════════════════
+async function apiPost(path, extra = {}) {
+  try {
+    const res = await fetch(path, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id:'koya', bio_state:{}, context:{ agent_context: true }, ...extra }),
+    });
+    if (!res.ok) throw new Error(res.status);
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
 function toast(msg) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3200);
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
-function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
-// Mood grid
-document.getElementById('moodGrid').innerHTML = Object.entries(MOODS).map(([id,m])=>`
-  <div class="mood ${LS.mood()===id?'on':''}" onclick="selectMood(this,'${id}')" data-mood="${id}">
-    <span class="mood-ico">${m.ico}</span>
-    <span class="mood-nm">${m.nm}</span>
-    <span class="mood-dc">${m.dc}</span>
-  </div>`).join('');
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+(function init() {
+  // Restore alarm state
+  const savedTime = S.get('alarmTime','06:30');
+  const savedOn   = S.get('alarmOn','false') === 'true';
+  const timeEl = document.getElementById('alarmTimePick');
+  const togEl  = document.getElementById('alarmToggle');
+  if (timeEl) timeEl.value = savedTime;
+  if (togEl)  togEl.checked = savedOn;
 
-document.getElementById('timePick').value = LS.alarm();
-document.getElementById('alarmClock').textContent = LS.alarm();
-document.getElementById('alarmOn').checked = LS.alarmOn();
-if(LS.alarmOn()) updateAlarmMsg();
+  // Restore prefs
+  const rateEl  = document.getElementById('speechRate');
+  const pitchEl = document.getElementById('speechPitch');
+  const spEl    = document.getElementById('startPage');
+  if (rateEl)  rateEl.value  = S.get('rate','0.82');
+  if (pitchEl) pitchEl.value = S.get('pitch','0.9');
+  if (spEl)    spEl.value    = S.get('startPage','home');
 
-synth.onvoiceschanged=()=>{};
-renderBooks();
-renderActiveMods();
-renderTimeline();
+  // Voice status
+  setVoiceStatus(S.get('hasVoice','false') === 'true');
 
-// First launch → setup; otherwise home
-if(!LS.hasVoice()) {
-  document.getElementById('setup').classList.add('on');
-} else {
-  document.getElementById('home').classList.add('on');
-  document.querySelector('.tabs .tab').classList.add('on');
-}
+  // Greeting
+  setGreeting();
+
+  // Active mods + badges
+  renderActiveMods();
+  updateBooksBadge();
+
+  // State pills placeholder
+  renderStatePills(null);
+
+  // Alarm label
+  updateAlarmLabel();
+
+  // Determine start page
+  const startPageId = S.get('startPage','home');
+  const startTab    = document.querySelector(`.tab[data-page="${startPageId}"]`);
+  goPage(startPageId, startTab);
+})();
 </script>
 </body>
 </html>
