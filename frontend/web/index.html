@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gnowme</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --orb: #7c6fff;
+      --orb-glow: rgba(124, 111, 255, 0.18);
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --card: #13131a;
+      --border: #1e1e2a;
+      --accent: #7c6fff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-size: 18px; font-weight: 600; letter-spacing: 0.05em; color: var(--text); }
+    .nav-links { display: flex; gap: 8px; }
+    .nav-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn.active, .nav-btn:hover {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; flex: 1; }
+    .page.active { display: flex; }
+
+    /* ── HOME ── */
+    #home {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      padding: 40px 20px;
+    }
+
+    .orb-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .orb-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid var(--orb-glow);
+      animation: ring-pulse 4s ease-in-out infinite;
+    }
+    .orb-ring:nth-child(1) { width: 200px; height: 200px; animation-delay: 0s; }
+    .orb-ring:nth-child(2) { width: 160px; height: 160px; animation-delay: 0.5s; }
+    .orb-ring:nth-child(3) { width: 120px; height: 120px; animation-delay: 1s; }
+
+    .orb {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #a89fff, var(--orb));
+      box-shadow: 0 0 40px rgba(124, 111, 255, 0.5), 0 0 80px rgba(124, 111, 255, 0.2);
+      animation: orb-breathe 4s ease-in-out infinite;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+    }
+    .orb:hover { box-shadow: 0 0 60px rgba(124, 111, 255, 0.7), 0 0 100px rgba(124, 111, 255, 0.3); }
+
+    @keyframes orb-breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+    @keyframes ring-pulse {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 0.05; transform: scale(1.05); }
+    }
+
+    .home-label {
+      text-align: center;
+    }
+    .home-label h1 { font-size: 22px; font-weight: 400; margin-bottom: 8px; }
+    .home-label p  { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 280px; }
+
+    .guidance-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      max-width: 380px;
+      width: 100%;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      min-height: 80px;
+      transition: color 0.4s;
+    }
+    .guidance-box.speaking { color: var(--text); }
+
+    .speak-btn {
+      background: var(--orb);
+      color: #fff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .speak-btn:hover { background: #9487ff; transform: translateY(-1px); }
+    .speak-btn:active { transform: translateY(0); }
+
+    /* ── GALLERY ── */
+    #gallery {
+      flex-direction: column;
+      padding: 32px;
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+      gap: 24px;
+    }
+    #gallery h2 { font-size: 20px; font-weight: 500; }
+    #gallery p.sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+    .search-bar {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar:focus { border-color: var(--accent); }
+    .search-bar::placeholder { color: var(--muted); }
+
+    .books-grid { display: flex; flex-direction: column; gap: 12px; }
+
+    .book-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+    .book-card:hover { border-color: var(--accent); }
+    .book-card.active-module { border-color: var(--accent); background: #13131f; }
+
+    .book-cover {
+      width: 56px;
+      height: 72px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .book-info { flex: 1; }
+    .book-title { font-size: 15px; font-weight: 500; margin-bottom: 3px; }
+    .book-author { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .book-tag {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(124,111,255,0.12);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .book-consciousness { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .book-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .book-price { font-size: 14px; font-weight: 600; }
+    .add-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .add-btn:hover { background: #9487ff; }
+    .add-btn.added {
+      background: #1e2a1e;
+      color: #4caf50;
+      border: 1px solid #4caf50;
+      cursor: default;
+    }
+    .priority-select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      outline: none;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1e1e2a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 100;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">gnowme</span>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('home', this)">Home</button>
+    <button class="nav-btn" onclick="showPage('gallery', this)">Books</button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<section class="page active" id="home">
+  <div class="orb-container">
+    <div class="orb-ring"></div>
+    <div class="orb-ring"></div>
+    <div class="orb-ring"></div>
+    <div class="orb" onclick="requestGuidance()" title="Tap for guidance"></div>
+  </div>
+
+  <div class="home-label">
+    <h1>Good to have you back.</h1>
+    <p>Tap the orb for a moment of clarity, or browse your consciousness modules below.</p>
+  </div>
+
+  <div class="guidance-box" id="guidanceBox">
+    Tap the orb whenever you need to reset…
+  </div>
+
+  <button class="speak-btn" onclick="requestGuidance()">Request Guidance</button>
+</section>
+
+<!-- GALLERY -->
+<section class="page" id="gallery">
+  <h2>Consciousness Gallery</h2>
+  <p class="sub">Choose the books that shape your mindset. Active modules guide you throughout the day.</p>
+
+  <input class="search-bar" type="text" placeholder="Search books or mindset types…" oninput="filterBooks(this.value)" />
+
+  <div class="books-grid" id="booksGrid"></div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BOOKS = [
+  {
+    id: "rich_dad_poor_dad",
+    title: "Rich Dad Poor Dad",
+    author: "Robert Kiyosaki",
+    price: 12.99,
+    category: "Financial Mindset",
+    emoji: "💰",
+    color: "#1a1a0f",
+    consciousness: "Asset-focused thinking, making money work for you, long-term wealth building."
+  },
+  {
+    id: "art_of_war",
+    title: "The Art of War",
+    author: "Sun Tzu",
+    price: 9.99,
+    category: "Strategic Calm",
+    emoji: "⚔️",
+    color: "#0f1a1a",
+    consciousness: "Composure under pressure, strategic patience, winning without unnecessary conflict."
+  },
+  {
+    id: "atomic_habits",
+    title: "Atomic Habits",
+    author: "James Clear",
+    price: 14.99,
+    category: "Discipline & Growth",
+    emoji: "⚡",
+    color: "#1a1a0f",
+    consciousness: "Small consistent actions, identity-based change, building systems that last."
+  },
+  {
+    id: "meditations",
+    title: "Meditations",
+    author: "Marcus Aurelius",
+    price: 8.99,
+    category: "Stoic Resilience",
+    emoji: "🏛️",
+    color: "#1a0f1a",
+    consciousness: "Inner composure, duty over comfort, what you control vs what you don't."
+  },
+  {
+    id: "power_of_now",
+    title: "The Power of Now",
+    author: "Eckhart Tolle",
+    price: 11.99,
+    category: "Present Awareness",
+    emoji: "🌊",
+    color: "#0f1a1a",
+    consciousness: "Releasing past and future anxiety, presence as the foundation of strength."
+  }
+];
+
+const activeModules = {};
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function renderBooks(filter = "") {
+  const grid = document.getElementById('booksGrid');
+  const filtered = BOOKS.filter(b =>
+    !filter ||
+    b.title.toLowerCase().includes(filter.toLowerCase()) ||
+    b.category.toLowerCase().includes(filter.toLowerCase()) ||
+    b.consciousness.toLowerCase().includes(filter.toLowerCase())
+  );
+  grid.innerHTML = filtered.map(book => `
+    <div class="book-card ${activeModules[book.id] ? 'active-module' : ''}" id="card-${book.id}">
+      <div class="book-cover" style="background:${book.color}">${book.emoji}</div>
+      <div class="book-info">
+        <div class="book-title">${book.title}</div>
+        <div class="book-author">${book.author}</div>
+        <span class="book-tag">${book.category}</span>
+        <div class="book-consciousness">${book.consciousness}</div>
+      </div>
+      <div class="book-actions">
+        <span class="book-price">$${book.price.toFixed(2)}</span>
+        <select class="priority-select" id="priority-${book.id}">
+          <option value="primary">Primary</option>
+          <option value="background">Background</option>
+        </select>
+        <button class="add-btn ${activeModules[book.id] ? 'added' : ''}"
+          id="btn-${book.id}"
+          onclick="addBook('${book.id}', '${book.title}')"
+          ${activeModules[book.id] ? 'disabled' : ''}>
+          ${activeModules[book.id] ? '✓ Active' : 'Add'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterBooks(val) { renderBooks(val); }
+
+async function addBook(bookId, title) {
+  const priority = document.getElementById(`priority-${bookId}`)?.value || 'primary';
+  try {
+    const res = await fetch('/books/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: 'koya', book_id: bookId, priority })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      activeModules[bookId] = priority;
+      renderBooks();
+      showToast(`"${title}" added as ${priority} module`);
+    }
+  } catch (e) {
+    showToast('Could not connect to backend');
+  }
+}
+
+async function requestGuidance() {
+  const box = document.getElementById('guidanceBox');
+  box.textContent = 'Listening…';
+  box.classList.remove('speaking');
+  try {
+    const res = await fetch('/speak/guidance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: 'koya',
+        bio_state: {},
+        context: { work_summary: 'daily work and focus', agent_context: true },
+        user_input: 'needing a moment of clarity'
+      })
+    });
+    const data = await res.json();
+    box.textContent = data.monologue;
+    box.classList.add('speaking');
+  } catch (e) {
+    box.textContent = 'What you cannot control is already gone. What you can control is right here, right now.';
+    box.classList.add('speaking');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+renderBooks();
+</script>
+</body>
+</html>

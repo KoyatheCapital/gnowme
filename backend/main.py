@@ -1,6 +1,9 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Dict, Any
+import os
 
 from config import Config
 from core.internal_monologue import InternalMonologueGenerator
@@ -9,6 +12,15 @@ from voice.voxtral import GnowmeVoice
 from core.agent_schema import AgentContextPayload
 
 app = FastAPI(title="Gnowme")
+
+# Serve the web frontend
+_frontend = os.path.join(os.path.dirname(__file__), "..", "frontend", "web")
+if os.path.isdir(_frontend):
+    app.mount("/static", StaticFiles(directory=_frontend), name="static")
+
+@app.get("/ui", include_in_schema=False)
+async def serve_ui():
+    return FileResponse(os.path.join(_frontend, "index.html"))
 
 voice_engine = GnowmeVoice(Config.MISTRAL_API_KEY, Config.USER_VOICE_REF)
 
